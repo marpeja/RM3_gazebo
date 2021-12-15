@@ -3,7 +3,7 @@
 ![Gazebo simulator](/docs/logo_rm_horiz.png?raw=true "Title")
 ![Gazebo simulator](/docs/gazebo_screenshot.png?raw=true "Title")
 
-This repo contains a gazebo+ROS2 simulator for the Robominer lab prototype propose by Taltech University.
+This repo contains a gazebo+ROS2 simulator for the Robominer lab prototype proposed by Taltech University.
 
 ## Clone this repo within your ROS2 dev_ws folder:
 ```
