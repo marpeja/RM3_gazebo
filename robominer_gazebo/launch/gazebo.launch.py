@@ -47,6 +47,13 @@ def generate_launch_description():
             arguments=["-topic", "robot_description", '-entity', 'cartpole']
         ),
 
+        Node(
+            package='robominer_gazebo',
+            executable='motor_to_body_vel.py',
+            name='motor2bodyvel',
+            output='screen'
+        ),
+
        
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(description_launch_path),
