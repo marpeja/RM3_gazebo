@@ -1,13 +1,17 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:macro name="base" params="length width height mass wheel_radius wheel_pos_z">
+
+  <xacro:property name="base_link_full" value="file://$(find robominer_description)/urdf/mesh/base_link_full.stl"/>
+
     <link name="base_footprint"/>
     
     <link name="base_link">
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-        <mesh filename="package://robominer_description/urdf/mesh/base_link_full.stl" scale="1 1 1"/>
+        <!-- <mesh filename="package://robominer_description/urdf/mesh/base_link_full.stl" scale="1 1 1"/> -->
+        <mesh filename="${base_link_full}" scale="1 1 1"/>
      	 </geometry>
         
         <material name="yellow">
@@ -18,7 +22,8 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-        <mesh filename="package://robominer_description/urdf/mesh/base_link_full.stl" scale="1 1 1"/>
+        <mesh filename="${base_link_full}" scale="1 1 1"/>
+        <!-- <mesh filename="package://robominer_description/urdf/mesh/base_link_full.stl" scale="1 1 1"/> -->
      	 </geometry>
       </collision>
 
