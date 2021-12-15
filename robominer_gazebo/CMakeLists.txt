@@ -17,10 +17,19 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
+find_package(rclpy REQUIRED)
 
 install(
   DIRECTORY launch rviz worlds
   DESTINATION share/${PROJECT_NAME}
+)
+
+#install python modules
+# ament_python_install_package(${PROJECT_NAME})
+install(PROGRAMS
+    scripts/motor_to_body_vel.py
+    DESTINATION lib/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)
