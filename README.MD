@@ -1,23 +1,26 @@
 # ROBOMINER SIMULATOR (ROS2 + Gazebo 11)
 
+![Gazebo simulator](/docs/logo_rm_horiz.png?raw=true "Title")
+![Gazebo simulator](/docs/gazebo_screenshot.png?raw=true "Title")
+
 This repo contains a gazebo+ROS2 simulator for the Robominer lab prototype propose by Taltech University.
 
-# Clone this repo within your ROS2 dev_ws folder:
+## Clone this repo within your ROS2 dev_ws folder:
 ```
 cd ~/dev_ws/src
 ```
 
-# to clone via https:
+## to clone via https:
 ```
 git clone https://github.com/walidremmas/robominer_taltech.git
 ```
 
-# to clone via SSH:
+## to clone via SSH:
 ```
 git clone git@github.com:walidremmas/robominer_taltech.git
 ```
 
-# Compile:
+## Compile:
 
 ```
 cd ~/dev_ws/
@@ -25,7 +28,7 @@ colcon build
 source install/setup.bash
 ```
 
-# To launch the simulator:
+## To launch the simulator:
 
 ```
 ros2 launch robominer_gazebo gazebo.launch.py
@@ -41,7 +44,7 @@ sudo cp ~/dev_ws/src/robominer_taltech/robominer_description/model.config /usr/s
 sudo cp -a ~/dev_ws/src/robominer_taltech/robominer_description/urdf/. /usr/share/gazebo-11/models/robominer_description/urdf
 ```
 
-# To control with Keyboard:
+## To control with Keyboard:
 
 After launching Gazebo, run in another terminal:
 
