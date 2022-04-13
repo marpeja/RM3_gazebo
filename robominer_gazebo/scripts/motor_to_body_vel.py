@@ -13,10 +13,10 @@ import rclpy
 
 from rclpy.node import Node
 from robominer_msgs.msg import MotorModuleCommand
-
 from geometry_msgs.msg import Twist
-
+import math
 import numpy as np
+from math import pi, tan
 
 
 class MotorToBodyVel(Node):
@@ -28,11 +28,11 @@ class MotorToBodyVel(Node):
     def __init__(self):
         super().__init__('motor_to_body_vel')
 
-        self.screw_radius = 0.055  # m
-        self.lx = 0.1
+        self.screw_radius = 0.078  # m
+        self.lx = 0.15
         self.ly = 0.3
-        self.lin_speed_multiplier = 0.001
-        self.ang_speed_multiplier = 0.01
+        self.lin_speed_multiplier = 1
+        self.ang_speed_multiplier = 1
 
         self.screw_speeds = [0.0, 0.0, 0.0, 0.0]
         self.fr_vel = 0.0
@@ -40,10 +40,10 @@ class MotorToBodyVel(Node):
         self.rl_vel = 0.0
         self.fl_vel = 0.0
 
-        self.fwd_kinematics = np.array([
-            [-1, -1, 1, 1],
+        self.fwd_kinematics = 1.0/4 * np.array([
+            [-1/tan(pi/6), -1/tan(pi/6), 1/tan(pi/6), 1/tan(pi/6)],
             [-1,  1, 1,-1],
-            [-(self.lx+self.ly), -(self.lx+self.ly), -(self.lx+self.ly),-(self.lx+self.ly)]
+            [-1/(self.lx + tan(pi/6) * self.ly), -1/(self.lx + tan(pi/6) * self.ly), -1/(self.lx + tan(pi/6) * self.ly), -1/(self.lx + tan(pi/6) * self.ly)]
         ])
 
         self.create_subscription(MotorModuleCommand, '/motor0/motor_rpm_setpoint', self.front_right, 10)
