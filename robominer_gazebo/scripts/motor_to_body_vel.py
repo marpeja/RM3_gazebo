@@ -14,7 +14,7 @@ import rclpy
 from rclpy.node import Node
 from robominer_msgs.msg import MotorModuleCommand
 from geometry_msgs.msg import Twist
-import math
+
 import numpy as np
 from math import pi, tan
 
@@ -29,6 +29,7 @@ class MotorToBodyVel(Node):
         super().__init__('motor_to_body_vel')
 
         self.screw_radius = 0.078  # m
+        self.screw_helix_angle = pi/6 # pi/6 for fl and rr screws, -pi/6 for fr and rl
         self.lx = 0.15
         self.ly = 0.3
         self.lin_speed_multiplier = 1
@@ -41,9 +42,9 @@ class MotorToBodyVel(Node):
         self.fl_vel = 0.0
 
         self.fwd_kinematics = 1.0/4 * np.array([
-            [-1/tan(pi/6), -1/tan(pi/6), 1/tan(pi/6), 1/tan(pi/6)],
+            [-tan(self.screw_helix_angle), -tan(self.screw_helix_angle), tan(self.screw_helix_angle), tan(self.screw_helix_angle)],
             [-1,  1, 1,-1],
-            [-1/(self.lx + tan(pi/6) * self.ly), -1/(self.lx + tan(pi/6) * self.ly), -1/(self.lx + tan(pi/6) * self.ly), -1/(self.lx + tan(pi/6) * self.ly)]
+            [-1/(self.lx + 1/tan(self.screw_helix_angle) * self.ly), -1/(self.lx + 1/tan(self.screw_helix_angle) * self.ly), -1/(self.lx + 1/tan(self.screw_helix_angle) * self.ly), -1/(self.lx + 1/tan(self.screw_helix_angle) * self.ly)]
         ])
 
         self.create_subscription(MotorModuleCommand, '/motor0/motor_rpm_setpoint', self.front_right, 10)
@@ -58,7 +59,7 @@ class MotorToBodyVel(Node):
 
     def front_right(self, msg):
         self.fr_vel = msg.motor_rpm_goal
-        # self.get_logger().info(f'front_right: {self.fr_vel}')
+        self.get_logger().info(f'front_right: {self.fr_vel}')
 
     def rear_right(self, msg):
         self.rr_vel = msg.motor_rpm_goal
@@ -77,15 +78,15 @@ class MotorToBodyVel(Node):
 
         self.screw_speeds = [self.fr_vel, self.rr_vel, self.rl_vel, self.fl_vel]
 
-        self.robot_twist = 1/self.screw_radius * np.dot(self.fwd_kinematics, self.screw_speeds) 
+        self.robot_twist = self.screw_radius * np.dot(self.fwd_kinematics, self.screw_speeds) 
 
-        body_vel.linear.x = self.robot_twist[0] * self.lin_speed_multiplier
+        body_vel.linear.x = self.robot_twist[0] * self.lin_speed_multiplier 
         body_vel.linear.y = self.robot_twist[1] * self.lin_speed_multiplier
         body_vel.angular.z = self.robot_twist[2] * self.ang_speed_multiplier
 
         self.cmd_vel_pub.publish(body_vel)
 
-        self.get_logger().info(f'fwd kinematics: {self.robot_twist}')
+        self.get_logger().info(f'fwd kinematics: {body_vel}')
 
 
 def main(args=None):
