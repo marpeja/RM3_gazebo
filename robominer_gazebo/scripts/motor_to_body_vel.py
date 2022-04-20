@@ -40,10 +40,11 @@ class MotorToBodyVel(Node):
         self.rr_vel = 0.0
         self.rl_vel = 0.0
         self.fl_vel = 0.0
+        self.rpm_to_radpersec = 2*pi/60.0
 
-        self.fwd_kinematics = 1.0/4 * np.array([
+        self.fwd_kinematics = 1.0/4.0 * np.array([
             [-tan(self.screw_helix_angle), -tan(self.screw_helix_angle), tan(self.screw_helix_angle), tan(self.screw_helix_angle)],
-            [-1,  1, 1,-1],
+            [-1.0,  1.0, 1.0,-1.0],
             [-1/(self.lx + 1/tan(self.screw_helix_angle) * self.ly), -1/(self.lx + 1/tan(self.screw_helix_angle) * self.ly), -1/(self.lx + 1/tan(self.screw_helix_angle) * self.ly), -1/(self.lx + 1/tan(self.screw_helix_angle) * self.ly)]
         ])
 
@@ -59,7 +60,7 @@ class MotorToBodyVel(Node):
 
     def front_right(self, msg):
         self.fr_vel = msg.motor_rpm_goal
-        self.get_logger().info(f'front_right: {self.fr_vel}')
+        # self.get_logger().info(f'front_right: {self.fr_vel}')
 
     def rear_right(self, msg):
         self.rr_vel = msg.motor_rpm_goal
@@ -76,7 +77,7 @@ class MotorToBodyVel(Node):
     def motor_to_body_vel(self):
         body_vel = Twist()
 
-        self.screw_speeds = [self.fr_vel, self.rr_vel, self.rl_vel, self.fl_vel]
+        self.screw_speeds = np.array([self.fr_vel, self.rr_vel, self.rl_vel, self.fl_vel]) * self.rpm_to_radpersec
 
         self.robot_twist = self.screw_radius * np.dot(self.fwd_kinematics, self.screw_speeds) 
 
@@ -85,8 +86,6 @@ class MotorToBodyVel(Node):
         body_vel.angular.z = self.robot_twist[2] * self.ang_speed_multiplier
 
         self.cmd_vel_pub.publish(body_vel)
-
-        self.get_logger().info(f'fwd kinematics: {body_vel}')
 
 
 def main(args=None):
