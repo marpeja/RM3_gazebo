@@ -13,10 +13,10 @@ import rclpy
 
 from rclpy.node import Node
 from robominer_msgs.msg import MotorModuleCommand
-
 from geometry_msgs.msg import Twist
 
 import numpy as np
+from math import pi, tan
 
 
 class MotorToBodyVel(Node):
@@ -28,22 +28,24 @@ class MotorToBodyVel(Node):
     def __init__(self):
         super().__init__('motor_to_body_vel')
 
-        self.screw_radius = 0.055  # m
-        self.lx = 0.1
+        self.screw_radius = 0.078  # m
+        self.screw_helix_angle = pi/6 # pi/6 for fl and rr screws, -pi/6 for fr and rl
+        self.lx = 0.15
         self.ly = 0.3
-        self.lin_speed_multiplier = 0.001
-        self.ang_speed_multiplier = 0.01
+        self.lin_speed_multiplier = 1
+        self.ang_speed_multiplier = 1
 
         self.screw_speeds = [0.0, 0.0, 0.0, 0.0]
         self.fr_vel = 0.0
         self.rr_vel = 0.0
         self.rl_vel = 0.0
         self.fl_vel = 0.0
+        self.rpm_to_radpersec = 2*pi/60.0
 
-        self.fwd_kinematics = np.array([
-            [-1, -1, 1, 1],
-            [-1,  1, 1,-1],
-            [-(self.lx+self.ly), -(self.lx+self.ly), -(self.lx+self.ly),-(self.lx+self.ly)]
+        self.fwd_kinematics = 1.0/4.0 * np.array([
+            [-tan(self.screw_helix_angle), -tan(self.screw_helix_angle), tan(self.screw_helix_angle), tan(self.screw_helix_angle)],
+            [-1.0,  1.0, 1.0,-1.0],
+            [-1/(self.lx + 1/tan(self.screw_helix_angle) * self.ly), -1/(self.lx + 1/tan(self.screw_helix_angle) * self.ly), -1/(self.lx + 1/tan(self.screw_helix_angle) * self.ly), -1/(self.lx + 1/tan(self.screw_helix_angle) * self.ly)]
         ])
 
         self.create_subscription(MotorModuleCommand, '/motor0/motor_rpm_setpoint', self.front_right, 10)
@@ -75,17 +77,15 @@ class MotorToBodyVel(Node):
     def motor_to_body_vel(self):
         body_vel = Twist()
 
-        self.screw_speeds = [self.fr_vel, self.rr_vel, self.rl_vel, self.fl_vel]
+        self.screw_speeds = np.array([self.fr_vel, self.rr_vel, self.rl_vel, self.fl_vel]) * self.rpm_to_radpersec
 
-        self.robot_twist = 1/self.screw_radius * np.dot(self.fwd_kinematics, self.screw_speeds) 
+        self.robot_twist = self.screw_radius * np.dot(self.fwd_kinematics, self.screw_speeds) 
 
-        body_vel.linear.x = self.robot_twist[0] * self.lin_speed_multiplier
+        body_vel.linear.x = self.robot_twist[0] * self.lin_speed_multiplier 
         body_vel.linear.y = self.robot_twist[1] * self.lin_speed_multiplier
         body_vel.angular.z = self.robot_twist[2] * self.ang_speed_multiplier
 
         self.cmd_vel_pub.publish(body_vel)
-
-        self.get_logger().info(f'fwd kinematics: {self.robot_twist}')
 
 
 def main(args=None):
