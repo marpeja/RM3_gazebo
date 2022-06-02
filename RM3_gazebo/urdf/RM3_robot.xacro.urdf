@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<robot name="RM3_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- Base Link -->
+  <xacro:include filename="$(find rm3_gazebo)/urdf/screw_snippets.xacro"/>
+
+  <link name="base_link">
+   </link>
+
+   <joint name="dummy_joint" type="fixed">
+     <parent link="base_link"/>
+     <child link="chassis"/>
+   </joint>
+
+  <link name="chassis">
+    <collision>
+      <origin xyz="0.0 0.0 0.3" rpy="1.57 0.0 0"/>
+      <geometry>
+        <mesh filename="file://$(find rm3_gazebo)/urdf/meshes/body_platform.dae"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0.0 0.0 0.3" rpy="1.57 0.0 0"/>
+      <geometry>
+        <mesh filename="file://$(find rm3_gazebo)/urdf/meshes/body_platform.dae"/>
+      </geometry>
+    </visual>
+
+    <visual>
+      <origin xyz="0.0 0.0 0.34" rpy="0.0 0.0 0"/>
+      <geometry>
+        <mesh filename="file://$(find rm3_gazebo)/urdf/meshes/electronics_box.dae"/>
+      </geometry>
+    </visual>
+
+    <inertial>
+      <origin xyz="0.0 0.0 0.28" rpy="0 0.0 0"/>
+      <mass value="8.0"/>
+      <inertia
+        ixx="0.36117"
+        ixy="0.0"
+        ixz="0.0"
+        iyy="0.329067"
+        iyz="0.0"
+        izz="0.693384"/>
+    </inertial>
+    <gazebo reference="chassis">
+      <mu1 value="0.0"/>
+      <mu2 value="0.0"/>
+      <kp value="1000.0" />
+      <kd value="1.0" />
+      <material>Gazebo/Grey</material>
+    </gazebo>
+  </link>
+
+  <!-- FR screw -->
+  <xacro:screw name="FR">
+    <origin xyz="0.0 -0.305 0.148" rpy="0 0 0" />
+  </xacro:screw>
+ <xacro:screw_collision name="FR_collision">
+     <origin xyz="0.0 -0.305 0.148" rpy="0 0 0" />
+ </xacro:screw_collision>
+
+  <!-- BR screw -->
+  <xacro:screw name="BR">
+    <origin xyz="0.0 -0.305 0.148" rpy="0 0 0" />
+  </xacro:screw>
+  <xacro:screw_collision name="BR_collision">
+      <origin xyz="0.0 -0.305 0.148" rpy="0 0 0" />
+  </xacro:screw_collision>
+
+
+  <!-- BL screw -->
+  <xacro:screw name="BL">
+    <origin xyz="0.0 0.305 0.148" rpy="0 0 3.14" />
+  </xacro:screw>
+  <xacro:screw_collision name="BL_collision">
+     <origin xyz="0.0 0.305 0.148" rpy="0 0 3.14" />
+  </xacro:screw_collision>
+
+  <xacro:screw name="FL">
+    <origin xyz="0.0 0.305 0.148" rpy="0 0 3.14" />
+  </xacro:screw>
+  <xacro:screw_collision name="FL_collision">
+    <origin xyz="0.0 0.305 0.148" rpy="0 0 3.14" />
+  </xacro:screw_collision>
+
+  <ros2_control name="GazeboSystem" type="system">
+    <hardware>
+      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+    </hardware>
+    <!-- Screws velocity controllers  -->
+    <xacro:velocity_controller joint_name="FR_screw"/>
+    <xacro:velocity_controller joint_name="BR_screw"/>
+    <xacro:velocity_controller joint_name="BL_screw"/>
+    <xacro:velocity_controller joint_name="FL_screw"/>
+  </ros2_control>
+
+  <gazebo>
+    <!-- Joint state publisher -->
+    <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+      <parameters>$(find rm3_gazebo)/config/screw_controller.yaml</parameters>
+    </plugin>
+  </gazebo>
+
+  <gazebo>
+  <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
+    <ros>
+      <argument>odom:=odom/unfiltered</argument>
+    </ros>
+    <command_topic>cmd_vel</command_topic>
+    <odometry_topic>odom/unfiltered</odometry_topic>
+    <odometry_frame>odom</odometry_frame>
+    <odometry_rate>20.0</odometry_rate>
+    <robot_base_frame>base_link</robot_base_frame>
+    <publish_odom>false</publish_odom>
+    <publish_odom_tf>false</publish_odom_tf>
+  </plugin>
+</gazebo>
+
+</robot>

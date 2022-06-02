@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+  <xacro:property name="ccw_mesh_file" value="file://$(find rm3_gazebo)/urdf/meshes/screw_ccw.dae"/>
+  <xacro:property name="cw_mesh_file" value="file://$(find rm3_gazebo)/urdf/meshes/screw_cw.dae"/>
+
+  <xacro:property name="screw_collision_radius" value="0.02"/>
+  <xacro:property name="screw_collision_height" value="0.2"/>
+
+  <xacro:property name="passive_wheel_diam" value="0.14" />
+  <xacro:property name="passive_wheel_mass" value="0.2" />
+
+
+  <!-- Screw velocity limits  -->
+  <xacro:property name="screw_min_velocity" value="-50"/>
+  <xacro:property name="screw_max_velocity" value="50"/>
+
+<!-- Macro for screw defintion -->
+  <xacro:macro name="screw" params="name *origin">
+      <joint name="${name}_screw" type="continuous">
+          <xacro:insert_block name="origin"/>
+          <parent link="chassis"/>
+          <child link="${name}_screw_link"/>
+          <axis xyz="1 0 0"/>
+          <dynamics damping="0.1"/>
+      </joint>
+
+      <link name="${name}_screw_link">
+        <inertial>
+            <xacro:if value="${name == 'BR' or name == 'FL'}">
+                 <origin xyz="-0.17 0.0 0.0" rpy="0 0.0 0"/>
+            </xacro:if>
+            <xacro:if value="${name == 'FR' or name == 'BL'}">
+                 <origin xyz="0.17 0.0 0.0" rpy="0 0.0 0"/>
+            </xacro:if>
+          <mass value="1" />
+          <inertia ixx="0.0012" ixy="0.0" ixz="0.0"
+                 iyy="0.00079" iyz="0.0"
+                 izz="0.0079" />
+          </inertial>
+
+        <visual>
+          <origin xyz="0 0 0" rpy="0 0 0" />
+          <xacro:if value="${name == 'FR' or name == 'BL'}">
+              <geometry>
+                <mesh filename="${cw_mesh_file}" scale="1 1 1"/>
+              </geometry>
+          </xacro:if>
+          <xacro:if value="${name == 'FL' or name == 'BR'}">
+              <geometry>
+                <mesh filename="${ccw_mesh_file}" scale="1 1 1"/>
+              </geometry>
+          </xacro:if>
+        </visual>
+
+        <collision>
+            <xacro:if value="${name == 'FR' or name == 'FL'}">
+                <origin xyz="0.15 0.0 0.0" rpy="0 1.57 0"/>
+            </xacro:if>
+            <xacro:if value="${name == 'BL' or name == 'BR'}">
+                <origin xyz="-0.15 0.0 0.0" rpy="0 1.57 0"/>
+            </xacro:if>
+           <geometry>
+             <cylinder radius="${screw_collision_radius}" length="${screw_collision_height}"/>
+           </geometry>
+        </collision>
+      </link>
+
+      <gazebo reference="${name}_screw_link">
+        <mu1 value="0.0"/>
+        <mu2 value="0.0"/>
+        <kp value="100000.0" />
+        <kd value="1.0" />
+        <material>Gazebo/Grey</material>
+      </gazebo>
+
+  </xacro:macro>
+
+
+   <!-- Macro for screw collision based on passive wheels -->
+  <xacro:macro name="screw_collision" params="name *origin">
+      <joint name="${name}_screw" type="fixed">
+          <xacro:insert_block name="origin"/>
+          <parent link="chassis"/>
+          <child link="${name}_screw_link"/>
+      </joint>
+
+      <link name="${name}_screw_link">
+        <inertial>
+            <xacro:if value="${name == 'BR_collision' or name == 'FL_collision'}">
+                 <origin xyz="-0.17 0.0 0.0" rpy="0 0.0 0"/>
+            </xacro:if>
+            <xacro:if value="${name == 'FR_collision' or name == 'BL_collision'}">
+                 <origin xyz="0.17 0.0 0.0" rpy="0 0.0 0"/>
+            </xacro:if>
+          <mass value="3" />
+          <inertia ixx="0.0012" ixy="0.0" ixz="0.0"
+                 iyy="0.00079" iyz="0.0"
+                 izz="0.0079" />
+          </inertial>
+
+        <collision>
+           <xacro:if value="${name == 'FR_collision' or name == 'BL_collision'}">
+               <geometry>
+                 <mesh filename="${cw_mesh_file}" scale="1 0.9 0.9"/>
+               </geometry>
+           </xacro:if>
+           <xacro:if value="${name == 'FL_collision' or name == 'BR_collision'}">
+               <geometry>
+                 <mesh filename="${ccw_mesh_file}" scale="1 0.9 0.9"/>
+               </geometry>
+           </xacro:if>
+        </collision>
+      </link>
+
+      <gazebo reference="${name}_screw_link">
+        <mu1 value="1"/>
+        <mu2 value="1"/>
+        <kp value="100000.0" />
+        <kd value="1.0" />
+        <material>Gazebo/Grey</material>
+      </gazebo>
+
+  </xacro:macro>
+
+
+
+ <xacro:macro name="velocity_controller" params="joint_name">
+     <joint name="${joint_name}">
+       <command_interface name="velocity">
+         <param name="min">${screw_min_velocity}</param>
+         <param name="max">${screw_max_velocity}</param>
+       </command_interface>
+       <state_interface name="position"/>
+       <state_interface name="velocity"/>
+     </joint>
+ </xacro:macro>
+
+</robot>
