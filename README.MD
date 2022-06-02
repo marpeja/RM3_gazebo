@@ -9,7 +9,7 @@ This repo contains a Gazebo11 + ROS2 Foxy simulator for the Robominer lab protot
 Make sure to install the robominer package first:
 https://github.com/robominers-eu/TALTECH_RM3_ROS_PACKAGES
 
-## Install ros2_control dependencies:
+# Install ros2_control dependencies:
 ```
 cd ~/dev_ws/src
 git clone https://github.com/ros-controls/ros2_control.git
@@ -17,7 +17,7 @@ git clone https://github.com/ros-controls/ros2_controllers.git
 git clone https://github.com/ros-simulation/gazebo_ros2_control.git
 ```
 
-# Checkout Foxy branch for each repo:
+## Checkout Foxy branch for each repo:
 ```
 cd ~/dev_ws/src/ros2_control
 git checkout foxy
@@ -28,13 +28,13 @@ git checkout foxy
 cd ~/dev_ws/src/gazebo_ros2_control
 git checkout foxy
 ```
-# Install dependencies:
+## Install dependencies:
 ```
 cd ~/dev_ws/
 rosdep install --from-paths src --ignore-src -r -y
 ```
 
-# Colcon build:
+## Colcon build ros2_control packages:
 ```
 colcon build --symlink-install --parallel-workers 3
 ```
@@ -46,7 +46,7 @@ cd ~/dev_ws/
 source install/setup.bash
 ```
 
-## Clone this repo within your ROS2 dev_ws folder:
+# RM3 simulator installation:
 
 ## to clone via https:
 ```
@@ -69,14 +69,14 @@ source install/setup.bash
 
 ## To launch the simulator:
 
-# For first time launch, First export the path of the models to Gazebo.
+For first time launch, First export the path of the models to Gazebo.
 
 ```
 echo 'export GAZEBO_MODEL_PATH=~/dev_ws/src/robominer_taltech/RM3_gazebo/models' >> ~/.bashrc
 
 source ~/.bashrc
 ```
-# Launching the simulator
+## Launching the simulator
 ```
 ros2 launch rm3_gazebo spawn_RM3.launch.py
 ```
