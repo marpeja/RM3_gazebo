@@ -8,6 +8,9 @@
   <xacro:property name="whisker_array_y" value="0.33"/>
   <xacro:property name="whisker_array_z" value="0.32"/>
 
+  <xacro:property name="enableWhiskers" value="disable"/>  <!-- "enable" or "disable" -->
+
+
   <link name="base_link">
    </link>
 
@@ -91,46 +94,50 @@
   </xacro:screw_collision>
 
   <!-- Whisker arrays -->
-  <xacro:whisker_array name="front">
-    <origin xyz="${whisker_array_x} 0 ${whisker_array_z}"
-            rpy="${whisker_array_angle} 0 1.57" />
-  </xacro:whisker_array>
+<xacro:if value="${enableWhiskers == 'enable'}">
+    <xacro:whisker_array name="front">
+      <origin xyz="${whisker_array_x} 0 ${whisker_array_z}"
+              rpy="${whisker_array_angle} 0 1.57" />
+    </xacro:whisker_array>
 
-  <xacro:whisker_array name="rear">
-    <origin xyz="${-whisker_array_x} 0 ${whisker_array_z}"
-            rpy="${-whisker_array_angle} 0 1.57" />
-  </xacro:whisker_array>
+    <xacro:whisker_array name="rear">
+      <origin xyz="${-whisker_array_x} 0 ${whisker_array_z}"
+              rpy="${-whisker_array_angle} 0 1.57" />
+    </xacro:whisker_array>
 
-  <xacro:whisker_array name="left">
-    <origin xyz="0 ${whisker_array_y} ${whisker_array_z}"
-            rpy="${-whisker_array_angle} 0 0" />
-  </xacro:whisker_array>
+    <xacro:whisker_array name="left">
+      <origin xyz="0 ${whisker_array_y} ${whisker_array_z}"
+              rpy="${-whisker_array_angle} 0 0" />
+    </xacro:whisker_array>
 
-  <xacro:whisker_array name="right">
-    <origin xyz="0 ${-whisker_array_y} ${whisker_array_z}"
-            rpy="${whisker_array_angle} 0 0" />
-  </xacro:whisker_array>
+    <xacro:whisker_array name="right">
+      <origin xyz="0 ${-whisker_array_y} ${whisker_array_z}"
+              rpy="${whisker_array_angle} 0 0" />
+    </xacro:whisker_array>
 
-  <!-- Whisker arrays in the bottom-->
-  <xacro:whisker_array name="bottom_right_right">
-    <origin xyz="0 ${-0.05 - 0.11} 0.275"
-            rpy="3.14 0 0" />
-  </xacro:whisker_array>
+    <!-- Whisker arrays in the bottom-->
+    <xacro:whisker_array name="bottom_right_right">
+      <origin xyz="0 ${-0.05 - 0.11} 0.275"
+              rpy="3.14 0 0" />
+    </xacro:whisker_array>
 
-  <xacro:whisker_array name="bottom_right_middle">
-    <origin xyz="0 ${-0.05} 0.275"
-            rpy="3.14 0 0" />
-  </xacro:whisker_array>
+    <xacro:whisker_array name="bottom_right_middle">
+      <origin xyz="0 ${-0.05} 0.275"
+              rpy="3.14 0 0" />
+    </xacro:whisker_array>
 
-  <xacro:whisker_array name="bottom_left_middle">
-    <origin xyz="0 ${0.05} 0.275"
-            rpy="3.14 0 0" />
-  </xacro:whisker_array>
+    <xacro:whisker_array name="bottom_left_middle">
+      <origin xyz="0 ${0.05} 0.275"
+              rpy="3.14 0 0" />
+    </xacro:whisker_array>
 
-  <xacro:whisker_array name="bottom_left_left">
-    <origin xyz="0 ${0.05 + 0.11} 0.275"
-            rpy="3.14 0 0" />
-  </xacro:whisker_array>
+    <xacro:whisker_array name="bottom_left_left">
+      <origin xyz="0 ${0.05 + 0.11} 0.275"
+              rpy="3.14 0 0" />
+    </xacro:whisker_array>
+
+</xacro:if>
+
 
   <!-- Screws velocity controllers  -->
   <ros2_control name="GazeboSystem" type="system">
