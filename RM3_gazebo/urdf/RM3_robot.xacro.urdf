@@ -2,6 +2,11 @@
 <robot name="RM3_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
   <!-- Base Link -->
   <xacro:include filename="$(find rm3_gazebo)/urdf/screw_snippets.xacro"/>
+  <xacro:include filename="$(find rm3_gazebo)/urdf/whisker_snippets.xacro"/>
+  <xacro:property name="whisker_array_angle" value="2.15"/>
+  <xacro:property name="whisker_array_x" value="0.39"/>
+  <xacro:property name="whisker_array_y" value="0.33"/>
+  <xacro:property name="whisker_array_z" value="0.32"/>
 
   <link name="base_link">
    </link>
@@ -85,6 +90,49 @@
     <origin xyz="0.0 0.305 0.148" rpy="0 0 3.14" />
   </xacro:screw_collision>
 
+  <!-- Whisker arrays -->
+  <xacro:whisker_array name="front">
+    <origin xyz="${whisker_array_x} 0 ${whisker_array_z}"
+            rpy="${whisker_array_angle} 0 1.57" />
+  </xacro:whisker_array>
+
+  <xacro:whisker_array name="rear">
+    <origin xyz="${-whisker_array_x} 0 ${whisker_array_z}"
+            rpy="${-whisker_array_angle} 0 1.57" />
+  </xacro:whisker_array>
+
+  <xacro:whisker_array name="left">
+    <origin xyz="0 ${whisker_array_y} ${whisker_array_z}"
+            rpy="${-whisker_array_angle} 0 0" />
+  </xacro:whisker_array>
+
+  <xacro:whisker_array name="right">
+    <origin xyz="0 ${-whisker_array_y} ${whisker_array_z}"
+            rpy="${whisker_array_angle} 0 0" />
+  </xacro:whisker_array>
+
+  <!-- Whisker arrays in the bottom-->
+  <xacro:whisker_array name="bottom_right_right">
+    <origin xyz="0 ${-0.05 - 0.11} 0.275"
+            rpy="3.14 0 0" />
+  </xacro:whisker_array>
+
+  <xacro:whisker_array name="bottom_right_middle">
+    <origin xyz="0 ${-0.05} 0.275"
+            rpy="3.14 0 0" />
+  </xacro:whisker_array>
+
+  <xacro:whisker_array name="bottom_left_middle">
+    <origin xyz="0 ${0.05} 0.275"
+            rpy="3.14 0 0" />
+  </xacro:whisker_array>
+
+  <xacro:whisker_array name="bottom_left_left">
+    <origin xyz="0 ${0.05 + 0.11} 0.275"
+            rpy="3.14 0 0" />
+  </xacro:whisker_array>
+
+  <!-- Screws velocity controllers  -->
   <ros2_control name="GazeboSystem" type="system">
     <hardware>
       <plugin>gazebo_ros2_control/GazeboSystem</plugin>
