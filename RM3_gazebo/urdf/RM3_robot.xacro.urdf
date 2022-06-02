@@ -44,15 +44,15 @@
         iyz="0.0"
         izz="0.693384"/>
     </inertial>
-    <gazebo reference="chassis">
-      <mu1 value="0.0"/>
-      <mu2 value="0.0"/>
-      <kp value="1000.0" />
-      <kd value="1.0" />
-      <material>Gazebo/Grey</material>
-    </gazebo>
   </link>
 
+  <gazebo reference="chassis">
+    <mu1 value="0.0"/>
+    <mu2 value="0.0"/>
+    <kp value="1000.0" />
+    <kd value="1.0" />
+    <material>Gazebo/Grey</material>
+  </gazebo>
   <!-- FR screw -->
   <xacro:screw name="FR">
     <origin xyz="0.0 -0.305 0.148" rpy="0 0 0" />

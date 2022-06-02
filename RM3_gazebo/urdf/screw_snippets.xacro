@@ -72,7 +72,6 @@
         <mu2 value="0.0"/>
         <kp value="100000.0" />
         <kd value="1.0" />
-        <material>Gazebo/Grey</material>
       </gazebo>
 
   </xacro:macro>
@@ -121,10 +120,7 @@
         <kd value="1.0" />
         <material>Gazebo/Grey</material>
       </gazebo>
-
   </xacro:macro>
-
-
 
  <xacro:macro name="velocity_controller" params="joint_name">
      <joint name="${joint_name}">
