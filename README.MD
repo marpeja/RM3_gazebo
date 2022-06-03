@@ -9,25 +9,15 @@ This repo contains a Gazebo11 + ROS2 Foxy simulator for the Robominer lab protot
 Make sure to install the robominer package first:
 https://github.com/robominers-eu/TALTECH_RM3_ROS_PACKAGES
 
-# Install ros2_control dependencies:
+# Install ros2_control dependencies from Foxy branch:
+
 ```
 cd ~/dev_ws/src
-git clone https://github.com/ros-controls/ros2_control.git
-git clone https://github.com/ros-controls/ros2_controllers.git
-git clone https://github.com/ros-simulation/gazebo_ros2_control.git
+git clone -b foxy https://github.com/ros-controls/ros2_control.git
+git clone -b foxy https://github.com/ros-controls/ros2_controllers.git
+git clone -b foxy https://github.com/ros-simulation/gazebo_ros2_control.git
 ```
 
-## Checkout Foxy branch for each repo:
-```
-cd ~/dev_ws/src/ros2_control
-git checkout foxy
-
-cd ~/dev_ws/src/ros2_controllers
-git checkout foxy
-
-cd ~/dev_ws/src/gazebo_ros2_control
-git checkout foxy
-```
 ## Install dependencies:
 ```
 cd ~/dev_ws/

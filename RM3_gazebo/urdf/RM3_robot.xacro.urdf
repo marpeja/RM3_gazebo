@@ -7,8 +7,13 @@
   <xacro:property name="whisker_array_x" value="0.39"/>
   <xacro:property name="whisker_array_y" value="0.33"/>
   <xacro:property name="whisker_array_z" value="0.32"/>
+  <xacro:property name="body_mass" value="0.00001"/>
+  <xacro:property name="body_collision_box_x" value="0.8"/>
+  <xacro:property name="body_collision_box_y" value="0.75"/>
+  <xacro:property name="body_collision_box_z" value="0.05"/>
 
-  <xacro:property name="enableWhiskers" value="disable"/>  <!-- "enable" or "disable" -->
+  <!-- Add whiskers on the robot --> <!-- "enable" or "disable" -->
+  <xacro:property name="enableWhiskers" value="nope"/>
 
 
   <link name="base_link">
@@ -20,10 +25,22 @@
    </joint>
 
   <link name="chassis">
+      <inertial>
+        <origin xyz="0.0 0.0 0.3" rpy="0.0 0.0 0.0"/>z
+        <mass value="25"/>
+        <inertia
+          ixx="1.15349"
+          ixy="0.0"
+          ixz="0.0"
+          iyy="1.02833"
+          iyz="0.0"
+          izz="2.16682"/>
+      </inertial>
+
     <collision>
-      <origin xyz="0.0 0.0 0.3" rpy="1.57 0.0 0"/>
+      <origin xyz="0.0 0.0 0.3" rpy="0.0 0.0 0.0"/>
       <geometry>
-        <mesh filename="file://$(find rm3_gazebo)/urdf/meshes/body_platform.dae"/>
+        <box size="${body_collision_box_x} ${body_collision_box_y} ${body_collision_box_z}" />
       </geometry>
     </collision>
 
@@ -33,30 +50,17 @@
         <mesh filename="file://$(find rm3_gazebo)/urdf/meshes/body_platform.dae"/>
       </geometry>
     </visual>
-
     <visual>
       <origin xyz="0.0 0.0 0.34" rpy="0.0 0.0 0"/>
       <geometry>
         <mesh filename="file://$(find rm3_gazebo)/urdf/meshes/electronics_box.dae"/>
       </geometry>
     </visual>
-
-    <inertial>
-      <origin xyz="0.0 0.0 0.28" rpy="0 0.0 0"/>
-      <mass value="8.0"/>
-      <inertia
-        ixx="0.36117"
-        ixy="0.0"
-        ixz="0.0"
-        iyy="0.329067"
-        iyz="0.0"
-        izz="0.693384"/>
-    </inertial>
   </link>
 
   <gazebo reference="chassis">
-    <mu1 value="0.0"/>
-    <mu2 value="0.0"/>
+    <mu1 value="50.0"/>
+    <mu2 value="50.0"/>
     <kp value="1000.0" />
     <kd value="1.0" />
     <material>Gazebo/Grey</material>
@@ -95,7 +99,7 @@
 
   <!-- Whisker arrays -->
 <xacro:if value="${enableWhiskers == 'enable'}">
-    <xacro:whisker_array name="front">
+    <!-- <xacro:whisker_array name="front">
       <origin xyz="${whisker_array_x} 0 ${whisker_array_z}"
               rpy="${whisker_array_angle} 0 1.57" />
     </xacro:whisker_array>
@@ -113,7 +117,7 @@
     <xacro:whisker_array name="right">
       <origin xyz="0 ${-whisker_array_y} ${whisker_array_z}"
               rpy="${whisker_array_angle} 0 0" />
-    </xacro:whisker_array>
+    </xacro:whisker_array> -->
 
     <!-- Whisker arrays in the bottom-->
     <xacro:whisker_array name="bottom_right_right">

@@ -31,7 +31,7 @@
             <uri>model://terrain/meshes/terrain.dae</uri>
           </mesh>
         </geometry>
-        <material> <!-- terrain color -->
+        <material>
           <ambient>0.45 0.27 0.07 1</ambient>
           <diffuse>0.45 0.27 0.07 1</diffuse>
           <specular>0 0 0 0</specular>
@@ -39,5 +39,8 @@
         </material>
       </visual>
     </link>
+
+
+
   </model>
 </sdf>
