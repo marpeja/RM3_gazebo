@@ -7,13 +7,14 @@
   <xacro:property name="whisker_array_x" value="0.39"/>
   <xacro:property name="whisker_array_y" value="0.33"/>
   <xacro:property name="whisker_array_z" value="0.32"/>
-  <xacro:property name="body_mass" value="0.00001"/>
+  <xacro:property name="body_mass" value="25"/>
   <xacro:property name="body_collision_box_x" value="0.8"/>
   <xacro:property name="body_collision_box_y" value="0.75"/>
   <xacro:property name="body_collision_box_z" value="0.05"/>
 
   <!-- Add whiskers on the robot --> <!-- "enable" or "disable" -->
-  <xacro:property name="enableWhiskers" value="nope"/>
+  <xacro:property name="enableWhiskers" value="enable"/>
+
 
 
   <link name="base_link">
@@ -26,15 +27,15 @@
 
   <link name="chassis">
       <inertial>
-        <origin xyz="0.0 0.0 0.3" rpy="0.0 0.0 0.0"/>z
-        <mass value="25"/>
+        <origin xyz="0.0 0.0 0.3" rpy="0.0 0.0 0.0"/>
+        <mass value="${body_mass}"/>
         <inertia
-          ixx="1.15349"
+          ixx="${(1.0/12.0) * body_mass * (body_collision_box_y ** 2 + body_collision_box_z ** 2)}"
           ixy="0.0"
           ixz="0.0"
-          iyy="1.02833"
+          iyy="${(1.0/12.0) * body_mass * (body_collision_box_x ** 2 + body_collision_box_z ** 2)}"
           iyz="0.0"
-          izz="2.16682"/>
+          izz="${(1.0/12.0) * body_mass * (body_collision_box_y ** 2 + body_collision_box_x ** 2)}"/>
       </inertial>
 
     <collision>
@@ -69,37 +70,37 @@
   <xacro:screw name="FR">
     <origin xyz="0.0 -0.305 0.148" rpy="0 0 0" />
   </xacro:screw>
- <xacro:screw_collision name="FR_collision">
+ <!-- <xacro:screw_collision name="FR_collision">
      <origin xyz="0.0 -0.305 0.148" rpy="0 0 0" />
- </xacro:screw_collision>
+ </xacro:screw_collision> -->
 
   <!-- BR screw -->
   <xacro:screw name="BR">
     <origin xyz="0.0 -0.305 0.148" rpy="0 0 0" />
   </xacro:screw>
-  <xacro:screw_collision name="BR_collision">
+  <!-- <xacro:screw_collision name="BR_collision">
       <origin xyz="0.0 -0.305 0.148" rpy="0 0 0" />
-  </xacro:screw_collision>
+  </xacro:screw_collision> -->
 
 
   <!-- BL screw -->
   <xacro:screw name="BL">
     <origin xyz="0.0 0.305 0.148" rpy="0 0 3.14" />
   </xacro:screw>
-  <xacro:screw_collision name="BL_collision">
+  <!-- <xacro:screw_collision name="BL_collision">
      <origin xyz="0.0 0.305 0.148" rpy="0 0 3.14" />
-  </xacro:screw_collision>
+  </xacro:screw_collision> -->
 
   <xacro:screw name="FL">
     <origin xyz="0.0 0.305 0.148" rpy="0 0 3.14" />
   </xacro:screw>
-  <xacro:screw_collision name="FL_collision">
+  <!-- <xacro:screw_collision name="FL_collision">
     <origin xyz="0.0 0.305 0.148" rpy="0 0 3.14" />
-  </xacro:screw_collision>
+  </xacro:screw_collision> -->
 
   <!-- Whisker arrays -->
 <xacro:if value="${enableWhiskers == 'enable'}">
-    <!-- <xacro:whisker_array name="front">
+    <xacro:whisker_array name="front">
       <origin xyz="${whisker_array_x} 0 ${whisker_array_z}"
               rpy="${whisker_array_angle} 0 1.57" />
     </xacro:whisker_array>
@@ -117,7 +118,7 @@
     <xacro:whisker_array name="right">
       <origin xyz="0 ${-whisker_array_y} ${whisker_array_z}"
               rpy="${whisker_array_angle} 0 0" />
-    </xacro:whisker_array> -->
+    </xacro:whisker_array>
 
     <!-- Whisker arrays in the bottom-->
     <xacro:whisker_array name="bottom_right_right">

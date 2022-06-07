@@ -32,15 +32,15 @@ class MotorToBodyVel(Node):
         self.screw_helix_angle = pi/6 # pi/6 for fl and rr screws, -pi/6 for fr and rl
         self.lx = 0.15
         self.ly = 0.3
-        self.lin_speed_multiplier = 2
-        self.ang_speed_multiplier = 2
+        self.lin_speed_multiplier = 5
+        self.ang_speed_multiplier = 5
 
         self.screw_speeds = [0.0, 0.0, 0.0, 0.0]
         self.fr_vel = 0.0
         self.rr_vel = 0.0
         self.rl_vel = 0.0
         self.fl_vel = 0.0
-        self.rpm_to_radpersec = 2*pi/60.0
+        self.rpm_to_radpersec = (2*pi)/60.0
 
         self.fwd_kinematics = 1.0/4.0 * np.array([
             [-tan(self.screw_helix_angle), -tan(self.screw_helix_angle), tan(self.screw_helix_angle), tan(self.screw_helix_angle)],
@@ -84,7 +84,6 @@ class MotorToBodyVel(Node):
         body_vel.linear.x = self.robot_twist[0] * self.lin_speed_multiplier
         body_vel.linear.y = self.robot_twist[1] * self.lin_speed_multiplier
         body_vel.angular.z = self.robot_twist[2] * self.ang_speed_multiplier
-
         self.cmd_vel_pub.publish(body_vel)
 
 

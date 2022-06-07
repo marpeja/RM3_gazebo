@@ -35,7 +35,7 @@ def generate_launch_description():
     #                 get_package_share_directory('gazebo_ros'), 'launch'), '/gazebo.launch.py']),
     #          )
     world_path = PathJoinSubstitution(
-        [FindPackageShare("rm3_gazebo"), "worlds", "terrain_world.world"]
+        [FindPackageShare("rm3_gazebo"), "worlds", "boxes_world.world"]
     )
     steering_node = launch_ros.actions.Node(
         package='robominer_locomotion_control',
@@ -69,7 +69,7 @@ def generate_launch_description():
                                    '-entity', 'RM3',
                                    '-x', '0.0',
                                    '-y', '0.0',
-                                   '-z', '-0.05',
+                                   '-z', '0.05',
                                    ],
                         output='screen')
 

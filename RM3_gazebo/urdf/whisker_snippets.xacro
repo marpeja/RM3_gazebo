@@ -14,8 +14,8 @@
   <xacro:property name="whisker_body_mass" value="0.008"/>
   <xacro:property name="base_link_mass" value="0.1"/>
   <xacro:property name="whisker_array_mass" value="2.75"/>
-  <xacro:property name="whisker_revolute_effort_limit" value="10"/>
-  <xacro:property name="whisker_revolute_vel_limit" value="${pi/2}"/>
+  <xacro:property name="whisker_revolute_effort_limit" value="0.01"/>
+  <xacro:property name="whisker_revolute_vel_limit" value="0.0"/>
 
   <xacro:property name="whisker_x" value="-0.0345"/>
   <xacro:property name="whisker_x_bias" value="0.075"/>
@@ -27,65 +27,77 @@
   <xacro:property name="whisker_collision_box_y" value="0.08"/>
   <xacro:property name="whisker_collision_box_z" value="0.07"/>
 
-
-
-
+  <xacro:property name="magnet_size_x" value="0.005"/>
+  <xacro:property name="magnet_size_y" value="0.005"/>
+  <xacro:property name="magnet_size_z" value="0.005"/>
+  <xacro:property name="magnet_mass" value="1e-4"/>
 
  <!-- WHISKER DEFITION -->
   <xacro:macro name="whisker" params="name id parent *origin">
       <!-- Magnet around x axis is connected to whisker array-->
+      <joint name="${name}_whisker_fixation_${id}" type="fixed">
+          <xacro:insert_block name="origin"/>
+          <parent link="${parent}"/>
+          <child link="${name}_dummy_${id}"/>
+      </joint>
 
-        <joint name="${name}_magnet_x_${id}" type="revolute">
-        <xacro:insert_block name="origin"/>
-        <parent link="${parent}"/>
-        <child link="${name}_magnet_x_link_${id}"/>
-        <axis xyz="1 0 0" />
-        <limit
+      <link name="${name}_dummy_${id}">
+          <inertial>
+          <mass value="${magnet_mass}"/>
+          <inertia
+            ixx="${(1.0/12.0) * magnet_mass * (magnet_size_y ** 2 + magnet_size_z ** 2)}"
+            ixy="0.0"
+            ixz="0.0"
+            iyy="${(1.0/12.0) * magnet_mass * (magnet_size_x ** 2 + magnet_size_z ** 2)}"
+            iyz="0.0"
+            izz="${(1.0/12.0) * magnet_mass * (magnet_size_y ** 2 + magnet_size_x ** 2)}"/>
+          </inertial>
+      </link>
+
+      <joint name="${name}_magnet_x_${id}" type="revolute">
+          <parent link="${name}_dummy_${id}"/>
+          <child link="${name}_magnet_x_link_${id}"/>
+          <axis xyz="1 0 0" />
+          <limit
           lower="${-pi/2}"
           upper="${pi/2}"
           effort="${whisker_revolute_effort_limit}"
           velocity="${whisker_revolute_vel_limit}" />
-        <dynamics
-          damping="${whisker_damping}"
-          friction="${whisker_friction}" />
-        </joint>
-
-        <link name="${name}_magnet_x_link_${id}">
-        <inertial>
-        <mass value="0.0005" />
-        <inertia ixx="1.0e-8" ixy="0" ixz="0" iyy="1.0e-8" iyz="0" izz="1.0e-8" />
-        </inertial>
-        </link>
-
-        <!-- Magnet around y axis is connected to whisker array-->
-
-        <joint name="${name}_magnet_y_${id}" type="revolute">
-        <parent link="${name}_magnet_x_link_${id}"/>
-        <child link="${name}_magnet_y_link_${id}"/>
-        <axis xyz="0 1 0" />
-        <limit
-          lower="${-pi/2}"
-          upper="${pi/2}"
-          effort="${whisker_revolute_effort_limit}"
-          velocity="${whisker_revolute_vel_limit}" />
-        <dynamics
+          <dynamics
             damping="${whisker_damping}"
-            friction="${whisker_friction}" />
-        </joint>
+            friction="${whisker_friction}"
+          />
+      </joint>
 
-        <link name="${name}_magnet_y_link_${id}">
-            <inertial>
-            <mass value="0.0005" />
-            <inertia ixx="1.0e-8" ixy="0" ixz="0" iyy="1.0e-8" iyz="0" izz="1.0e-8" />
-            </inertial>
-        </link>
+      <link name="${name}_magnet_x_link_${id}">
+          <inertial>
+          <mass value="${magnet_mass}"/>
+          <inertia
+            ixx="${(1.0/12.0) * magnet_mass * (magnet_size_y ** 2 + magnet_size_z ** 2)}"
+            ixy="0.0"
+            ixz="0.0"
+            iyy="${(1.0/12.0) * magnet_mass * (magnet_size_x ** 2 + magnet_size_z ** 2)}"
+            iyz="0.0"
+            izz="${(1.0/12.0) * magnet_mass * (magnet_size_y ** 2 + magnet_size_x ** 2)}"/>
+        </inertial>
+      </link>
 
-      <!-- Whisker fixed on magnet y-->
-      <joint name="${name}_whisker_${id}" type="fixed">
+
+      <!-- Whisker fixed on magnet x-->
+      <joint name="${name}_whisker_${id}" type="revolute">
           <origin xyz="0 0 0" rpy="0 0 0" />
-          <!-- <parent link="${name}_magnet_y_link_${id}"/> -->
-           <parent link="${name}_magnet_y_link_${id}"/>
+          <parent link="${name}_dummy_${id}"/>
           <child link="${name}_whisker_link_${id}"/>
+          <axis xyz="0 1 0" />
+          <limit
+            lower="${-pi/2} + 0.2"
+            upper="${pi/2} - 0.2"
+            effort="${whisker_revolute_effort_limit}"
+            velocity="${whisker_revolute_vel_limit}" />
+          <dynamics
+              damping="${whisker_damping}"
+              friction="${whisker_friction}"
+              />
       </joint>
 
       <link name="${name}_whisker_link_${id}">
@@ -94,20 +106,16 @@
                       rpy="0 0 0" />
             <mass
               value="${whisker_body_mass}" />
-            <!-- <inertia
-              ixx="${1/12 * whisker_body_mass * (3* whisker_radius ** 2 + whisker_length **2 )}" ixy="0" ixz="0"
-              iyy="${1/12 * whisker_body_mass * (3* whisker_radius ** 2 + whisker_length **2 )}" iyz="0"
-              izz="${1/2 * whisker_body_mass * whisker_radius ** 2}" /> -->
               <inertia
-                ixx="${(1/12)*whisker_body_mass*(3*whisker_radius*whisker_radius + whisker_length*whisker_length)}" ixy="0" ixz="0"
-                iyy="${(1/12)*whisker_body_mass*(3*whisker_radius*whisker_radius + whisker_length*whisker_length)}" iyz="0"
-                izz="${(1/2)*whisker_body_mass*whisker_radius*whisker_radius}" />
+                ixx="${(1/12)*whisker_body_mass*(3*whisker_radius**2 + whisker_length**2)}" ixy="0" ixz="0"
+                iyy="${(1/12)*whisker_body_mass*(3*whisker_radius**2 + whisker_length**2)}" iyz="0"
+                izz="${(1/2)*whisker_body_mass*whisker_radius**2}" />
           </inertial>
           <visual>
               <origin xyz="0 0 ${whisker_length/2}"
                       rpy="0 0 0" />
               <geometry>
-                <cylinder radius="${whisker_radius}" length="${whisker_length-0.01}"/>
+                <cylinder radius="${whisker_radius}" length="${whisker_length}"/>
               </geometry>
           </visual>
 
@@ -115,22 +123,22 @@
               <origin xyz="0 0 ${whisker_length/2}"
                       rpy="0 0 0" />
               <geometry>
-                <cylinder radius="${whisker_radius}" length="${whisker_length-0.01}"/>
+                <cylinder radius="${whisker_radius}" length="${whisker_length}"/>
               </geometry>
           </collision>
       </link>
 
-      <!-- <gazebo reference="${name}_magnet_x_${id}">
-      <implicitSpringDamper>true</implicitSpringDamper>
-      <springStiffness>10000</springStiffness>
-      <springReference>0.0</springReference>
+      <gazebo reference="${name}_magnet_x_${id}">
+          <implicitSpringDamper>true</implicitSpringDamper>
+          <springStiffness>5.7</springStiffness>
+          <springReference>0.0</springReference>
       </gazebo>
 
-      <gazebo reference="${name}_magnet_y_${id}">
-      <implicitSpringDamper>true</implicitSpringDamper>
-      <springStiffness>10000</springStiffness>
-      <springReference>0.0</springReference>
-      </gazebo> -->
+      <gazebo reference="${name}_whisker_${id}">
+          <implicitSpringDamper>true</implicitSpringDamper>
+          <springStiffness>5.7</springStiffness>
+          <springReference>0.0</springReference>
+      </gazebo>
   </xacro:macro>
 
 
@@ -154,25 +162,14 @@
             iyz="0.0"
             izz="${(1/12)*whisker_array_mass*(whisker_collision_box_x*whisker_collision_box_x + whisker_collision_box_y*whisker_collision_box_y)}"/>
         </inertial>
-
           <visual>
               <geometry>
                 <mesh filename="${whisker_array_mesh_file}" scale="1 1 1"/>
               </geometry>
           </visual>
-
-          <collision>
-            <geometry>
-              <box size="${whisker_collision_box_x} ${whisker_collision_box_y} ${whisker_collision_box_z}" />
-            </geometry>
-          </collision>
       </link>
 
       <gazebo reference="${name}_whisker_array_link">
-        <mu1 value="1"/>
-        <mu2 value="1"/>
-        <kp value="100000.0" />
-        <kd value="1.0" />
         <material>Gazebo/DarkGrey</material>
       </gazebo>
 
