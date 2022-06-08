@@ -32,8 +32,8 @@ class MotorToBodyVel(Node):
         self.screw_helix_angle = pi/6 # pi/6 for fl and rr screws, -pi/6 for fr and rl
         self.lx = 0.15
         self.ly = 0.3
-        self.lin_speed_multiplier = 5
-        self.ang_speed_multiplier = 5
+        self.lin_speed_multiplier = 2
+        self.ang_speed_multiplier = 2
 
         self.screw_speeds = [0.0, 0.0, 0.0, 0.0]
         self.fr_vel = 0.0

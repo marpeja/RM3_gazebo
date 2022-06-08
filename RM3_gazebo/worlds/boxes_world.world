@@ -1,5 +1,7 @@
 <sdf version="1.4">
-
+    <!-- June 2022 -->
+    <!-- Author: Walid Remmas -->
+    <!-- Contact: walid.remmas@ŧaltech.ee -->
      <gravity>0.0 0.0 -9.81</gravity>
 
     <world name="default">
@@ -12,19 +14,39 @@
      </include>
 
 
+     <!-- Faster physics solver to run the simulation on limited hardware -->
+     <physics default="1" name="ODE_SOLVER" type="ode">
+      <real_time_update_rate>333.0</real_time_update_rate>
+      <ode>
+        <solver>
+          <type>quick</type>
+        </solver>
+        <constraints>
+          <contact_max_correcting_vel>0.1</contact_max_correcting_vel>
+          <contact_surface_layer>0.0001</contact_surface_layer>
+          <!-- <cfm>4.60</cfm> -->
+          <erp>0.9</erp>
+        </constraints>
+      </ode>
+      <max_contacts>100</max_contacts>
+      <max_step_size>0.003</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+     </physics>
+
+
      <model name ='box1'>
      <static>true</static>
      <pose>0.8 0 0 0 0 0</pose>
      <link name ='box1'>
-      <pose>0 0 0.05 0 0 0</pose>
+      <pose>0 0 0.025 0 0 0</pose>
       <collision name ='collision'>
         <geometry>
-          <box><size>0.2 0.2 0.1</size></box>
+          <box><size>0.2 0.2 0.05</size></box>
         </geometry>
       </collision>
       <visual name ='visual'>
         <geometry>
-          <box><size>0.2 0.2 0.1</size></box>
+          <box><size>0.2 0.2 0.05</size></box>
         </geometry>
       </visual>
      </link>

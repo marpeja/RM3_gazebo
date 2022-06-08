@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+<!-- June 2022 -->
+<!-- Author: Walid Remmas -->
+<!-- Contact: walid.remmas@ŧaltech.ee -->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <!-- Mesh files -->
@@ -24,6 +27,9 @@
           <child link="${name}_screw_link"/>
           <axis xyz="1 0 0"/>
           <dynamics damping="0.1"/>
+          <limit
+          effort="500"
+          velocity="${pi}" />
       </joint>
 
       <link name="${name}_screw_link">
@@ -55,6 +61,18 @@
               </geometry>
           </xacro:if>
         </visual>
+
+        <collision>
+            <xacro:if value="${name == 'FR' or name == 'BL'}">
+                <origin xyz="0.0 0.0 0.0" rpy="0 1.57 0"/>
+            </xacro:if>
+            <xacro:if value="${name == 'FL' or name == 'BR'}">
+                <origin xyz="-0.0 0.0 0.0" rpy="0 1.57 0"/>
+            </xacro:if>
+           <geometry>
+             <cylinder radius="0.01" length="0.25"/>
+           </geometry>
+        </collision>
 
       </link>
       <!-- *********************************************** -->
@@ -109,16 +127,15 @@
       </link>
 
       <gazebo reference="${name}_screw_collision_link">
-
-        <mu1 value="1.1"/>
-        <mu2 value="1.1"/>
+        <mu1 value="0.5"/>
+        <mu2 value="0.5"/>
         <kp value="10000.0" />
         <kd value="100000.0" />
         <material>Gazebo/Grey</material>
       </gazebo>
   </xacro:macro>
 
-
+<!-- Screw velocity controller -->
  <xacro:macro name="velocity_controller" params="joint_name">
      <joint name="${joint_name}">
        <command_interface name="velocity">
