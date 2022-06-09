@@ -62,7 +62,7 @@ source install/setup.bash
 For first time launch, First export the path of the models to Gazebo.
 
 ```
-echo 'export GAZEBO_MODEL_PATH=~/dev_ws/src/robominer_taltech/RM3_gazebo/models' >> ~/.bashrc
+echo 'export GAZEBO_MODEL_PATH=~/dev_ws/src/RM3_gazebo/RM3_gazebo/models' >> ~/.bashrc
 
 source ~/.bashrc
 ```
