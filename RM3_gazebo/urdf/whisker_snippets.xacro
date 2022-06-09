@@ -31,10 +31,18 @@
   <xacro:property name="magnet_size_z" value="0.005"/>
   <xacro:property name="magnet_mass" value="1e-4"/>
 
+
+<!-- Macro to publish the whisker states -->
+  <xacro:macro name="whisker_feedback" params="joint_name">
+      <joint name="${joint_name}">
+        <state_interface name="position"/>
+      </joint>
+  </xacro:macro>
+
  <!-- WHISKER DEFITION -->
   <xacro:macro name="whisker" params="name id parent *origin">
       <!-- Magnet around x axis is connected to base_array and rotating around x-->
-      <joint name="${name}_whisker_x_${id}" type="revolute">
+      <joint name="${name}_whisker_${id}_x" type="revolute">
           <xacro:insert_block name="origin"/>
           <parent link="${parent}"/>
           <child link="${name}_whisker_x_link_${id}"/>
@@ -49,6 +57,9 @@
             friction="${whisker_friction}"
           />
       </joint>
+
+
+
 
       <link name="${name}_whisker_x_link_${id}">
           <inertial>
@@ -70,7 +81,7 @@
 
 
       <!-- Whisker fixed on magnet x and rotating around y-->
-      <joint name="${name}_whisker_y_${id}" type="revolute">
+      <joint name="${name}_whisker_${id}_y" type="revolute">
           <origin xyz="0 0 0" rpy="0 0 0" />
           <parent link="${name}_whisker_x_link_${id}"/>
           <child link="${name}_whisker_y_link_${id}"/>
@@ -85,6 +96,15 @@
               friction="${whisker_friction}"
               />
       </joint>
+
+      <ros2_control name="GazeboSystem" type="system">
+        <hardware>
+          <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+        </hardware>
+         <xacro:whisker_feedback joint_name="${name}_whisker_${id}_x"/>
+         <xacro:whisker_feedback joint_name="${name}_whisker_${id}_y"/>
+      </ros2_control>
+
 
       <link name="${name}_whisker_y_link_${id}">
           <inertial>
@@ -115,13 +135,13 @@
           </collision>
       </link>
 
-      <gazebo reference="${name}_whisker_x_${id}">
+      <gazebo reference="$${name}_whisker_${id}_x">
           <implicitSpringDamper>true</implicitSpringDamper>
           <springStiffness>1.0</springStiffness>
           <springReference>0.0</springReference>
       </gazebo>
 
-      <gazebo reference="${name}_whisker_y_${id}">
+      <gazebo reference="${name}_whisker_${id}_y">
           <implicitSpringDamper>true</implicitSpringDamper>
           <springStiffness>1.0</springStiffness>
           <springReference>0.0</springReference>
@@ -133,6 +153,8 @@
         <mu2>0.2</mu2>
       </gazebo>
   </xacro:macro>
+
+
 
 
  <!-- WHISKER ARRAY DEFITION -->

@@ -81,10 +81,17 @@ def generate_launch_description():
             cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so',  '-s', 'libgazebo_ros_init.so', world_path],
             output='screen'
         ),
+        # Node(
+        #     package='rm3_gazebo',
+        #     executable='motor_to_body_vel.py',
+        #     name='motor2bodyvel',
+        #     output='screen'
+        # ),
+
         Node(
             package='rm3_gazebo',
-            executable='motor_to_body_vel.py',
-            name='motor2bodyvel',
+            executable='whisker_state_publisher.py',
+            name='whiskerStates',
             output='screen'
         ),
 

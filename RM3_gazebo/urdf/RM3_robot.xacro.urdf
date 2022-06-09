@@ -71,61 +71,61 @@
   </gazebo>
   <!-- FR screw -->
   <xacro:screw name="FR">
-    <origin xyz="0.0 -0.305 0.148" rpy="0 0 0" />
+    <origin xyz="0.01 -0.305 0.148" rpy="0 0 0" />
   </xacro:screw>
   <!-- BR screw -->
   <xacro:screw name="BR">
-    <origin xyz="0.0 -0.305 0.148" rpy="0 0 0" />
+    <origin xyz="-0.01 -0.305 0.148" rpy="0 0 0" />
   </xacro:screw>
 
   <!-- BL screw -->
   <xacro:screw name="BL">
-    <origin xyz="0.0 0.305 0.148" rpy="0 0 3.14" />
+    <origin xyz="-0.01 0.305 0.148" rpy="0 0 3.14" />
   </xacro:screw>
 
   <xacro:screw name="FL">
-    <origin xyz="0.0 0.305 0.148" rpy="0 0 3.14" />
+    <origin xyz="0.01 0.305 0.148" rpy="0 0 3.14" />
   </xacro:screw>
 
   <!-- Whisker arrays -->
 <xacro:if value="${enableWhiskers == 'enable'}">
-    <xacro:whisker_array name="front">
+    <xacro:whisker_array name="7_front">
       <origin xyz="${whisker_array_x} 0 ${whisker_array_z}"
               rpy="${whisker_array_angle} 0 ${pi/2}" />
     </xacro:whisker_array>
 
-    <xacro:whisker_array name="rear">
+    <xacro:whisker_array name="6_rear">
       <origin xyz="${-whisker_array_x} 0 ${whisker_array_z}"
               rpy="${-whisker_array_angle} 0 ${pi/2}" />
     </xacro:whisker_array>
 
-    <xacro:whisker_array name="left">
+    <xacro:whisker_array name="5_left">
       <origin xyz="0 ${whisker_array_y} ${whisker_array_z}"
               rpy="${-whisker_array_angle} 0 0" />
     </xacro:whisker_array>
 
-    <xacro:whisker_array name="right">
+    <xacro:whisker_array name="4_right">
       <origin xyz="0 ${-whisker_array_y} ${whisker_array_z}"
               rpy="${whisker_array_angle} 0 0" />
     </xacro:whisker_array>
 
     <!-- Whisker arrays in the bottom-->
-    <xacro:whisker_array name="bottom_right_right">
+    <xacro:whisker_array name="0_bottom_right_right">
       <origin xyz="0 ${-0.05 - 0.11} 0.275"
               rpy="${pi} 0 0" />
     </xacro:whisker_array>
 
-    <xacro:whisker_array name="bottom_right_middle">
+    <xacro:whisker_array name="1_bottom_right_middle">
       <origin xyz="0 ${-0.05} 0.275"
               rpy="${pi} 0 0" />
     </xacro:whisker_array>
 
-    <xacro:whisker_array name="bottom_left_middle">
+    <xacro:whisker_array name="2_bottom_left_middle">
       <origin xyz="0 ${0.05} 0.275"
               rpy="${pi} 0 0" />
     </xacro:whisker_array>
 
-    <xacro:whisker_array name="bottom_left_left">
+    <xacro:whisker_array name="3_bottom_left_left">
       <origin xyz="0 ${0.05 + 0.11} 0.275"
               rpy="${pi} 0 0" />
     </xacro:whisker_array>
