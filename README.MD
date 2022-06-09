@@ -41,13 +41,12 @@ source install/setup.bash
 ## to clone via https:
 ```
 cd ~/dev_ws/src
-git clone https://github.com/walidremmas/robominer_taltech.git
+git clone https://github.com/robominers-eu/RM3_gazebo.git
 ```
 
 ## to clone via SSH:
 ```
-git clone https://github.com/robominers-eu/RM3_gazebo.git
-
+git clone git@github.com:robominers-eu/RM3_gazebo.git
 ```
 
 ## Compile:
