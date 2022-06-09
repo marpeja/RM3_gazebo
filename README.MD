@@ -2,7 +2,7 @@
 
 
 ![Gazebo simulator](/docs/logo_rm_horiz.png?raw=true "Title")
-![Gazebo simulator](/docs/gazebo_screenshot.png?raw=true "Title")
+![Gazebo simulator](/docs/gazebo_screenshot_whiskers.png?raw=true "Title")
 
 This repo contains a Gazebo11 + ROS2 Foxy simulator for the Robominer lab prototype RM3 designed at Taltech University.
 
@@ -46,7 +46,8 @@ git clone https://github.com/walidremmas/robominer_taltech.git
 
 ## to clone via SSH:
 ```
-git clone git@github.com:walidremmas/robominer_taltech.git
+git clone https://github.com/robominers-eu/RM3_gazebo.git
+
 ```
 
 ## Compile:
