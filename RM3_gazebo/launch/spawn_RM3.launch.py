@@ -26,7 +26,7 @@ import xacro
 def generate_launch_description():
 
     world_path = PathJoinSubstitution(
-        [FindPackageShare("rm3_gazebo"), "worlds", "terrain_world.world"]
+        [FindPackageShare("rm3_gazebo"), "worlds", "boxes_world.world"]
     )
     steering_node = launch_ros.actions.Node(
         package='robominer_locomotion_control',
@@ -81,12 +81,12 @@ def generate_launch_description():
             cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so',  '-s', 'libgazebo_ros_init.so', world_path],
             output='screen'
         ),
-        # Node(
-        #     package='rm3_gazebo',
-        #     executable='motor_to_body_vel.py',
-        #     name='motor2bodyvel',
-        #     output='screen'
-        # ),
+        Node(
+            package='rm3_gazebo',
+            executable='motor_to_body_vel.py',
+            name='motor2bodyvel',
+            output='screen'
+        ),
 
         Node(
             package='rm3_gazebo',

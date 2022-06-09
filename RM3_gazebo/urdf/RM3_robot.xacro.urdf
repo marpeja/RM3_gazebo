@@ -6,6 +6,7 @@
   <!-- Base Link -->
   <xacro:include filename="$(find rm3_gazebo)/urdf/screw_snippets.xacro"/>
   <xacro:include filename="$(find rm3_gazebo)/urdf/whisker_snippets.xacro"/>
+  <xacro:include filename="$(find rm3_gazebo)/urdf/sensors.xacro"/>
   <xacro:property name="whisker_array_angle" value="2.15"/>
   <xacro:property name="whisker_array_x" value="0.39"/>
   <xacro:property name="whisker_array_y" value="0.33"/>
@@ -166,5 +167,8 @@
     <publish_odom_tf>true</publish_odom_tf>
   </plugin>
 </gazebo>
+
+<!-- Add sensors blocs -->
+<xacro:robot_sensors parent="base_link"/>
 
 </robot>

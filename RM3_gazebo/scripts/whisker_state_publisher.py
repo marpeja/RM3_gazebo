@@ -74,7 +74,7 @@ class WhiskerPublisher(Node):
                     col_num = 0
 
             self.whisker_pub.publish(all_whisker_msg)
-            
+
 def main(args=None):
     rclpy.init(args=args)
     whisker_node = WhiskerPublisher()
