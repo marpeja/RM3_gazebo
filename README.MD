@@ -78,3 +78,14 @@ After launching Gazebo, run in another terminal:
 ```
 ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r cmd_vel:=cmd_vel_keyboard
 ```
+
+## Worlds in this repo:
+There are currently 3 world models:
+  * empty_world: basic empty world with only ground and RM3 robot.
+  * boxes_world: World with a box in front of the robot to test whiskers collision behaviour.
+  * terrain_world: World with an uneven terrain.
+
+To select a world, you need to edit the "_world_path_" variable in file "_/launch/spawn_RM3.launch.py_". colcon build the package for changes to take effect.
+
+## Enabling / Disabling Whiskers on the robot:
+To enable or disable the simulation of the whiskers on the robot, simply edit the file "_/urdf/RM3_robot.xacro.urdf_", and set the xacro:property "_enableWhiskers_" to either "_enable_" or "_disable_". colcon build the package for changes to take effect.
