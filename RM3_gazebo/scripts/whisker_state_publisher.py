@@ -15,6 +15,29 @@ from sensor_msgs.msg import JointState
 
 import numpy as np
 
+######### Order of whisker rows and columns #########
+"""
+
+       ***************************************
+     *(7,7)(7,6)(7,5)(7,4)(7,3)(7,1)(7,1)(7,0)*
+       *********** front of robot ************
+       ######################################
+*(5,7) #  (3,7)    (2,7)    (1,7)    (0,7)  # (4,7)*
+*(5,6) #  (3,6)    (2,6)    (1,6)    (0,6)  # (4,6)*
+*(5,5) #  (3,5)    (2,5)    (1,5)    (0,5)  # (4,5)*
+*(5,4) #  (3,4)    (2,4)    (1,4)    (0,4)  # (4,4)*
+*(5,3) #  (3,3)    (2,3)    (1,3)    (0,3)  # (4,3)*
+*(5,2) #  (3,2)    (2,2)    (1,2)    (0,2)  # (4,2)*
+*(5,1) #  (3,1)    (2,1)    (1,1)    (0,1)  # (4,1)*
+*(5,0) #  (3,0)    (2,0)    (1,0)    (0,0)  # (4,0)*
+       ######################################
+       ************ rear of robot ************
+     *(6,7)(6,6)(6,5)(6,4)(6,3)(6,2)(6,1)(6,0)*
+       ***************************************
+"""
+#####################################################
+
+
 class WhiskerPublisher(Node):
     """Docstring
 
@@ -28,7 +51,9 @@ class WhiskerPublisher(Node):
 
         self.whisker_pub = self.create_publisher(WhiskerArray, '/WhiskerStates', 10)
         self.whisker_total = 64
-
+        self.declare_parameter('which_representation')
+        self.which_representation = self.get_parameter('which_representation').value
+        self.whisker_length = 0.15
 
     def JointStateCallback(self, msg):
         # making sure the jointState message contains all joints (128 for whiskers + 4 screws)
@@ -51,7 +76,7 @@ class WhiskerPublisher(Node):
             all_whisker_msg.header.stamp = self.get_clock().now().to_msg()
             all_whisker_msg.num_mux = 6
             all_whisker_msg.num_sensors = 8
-            all_whisker_msg.representation = "Cartesian"
+            all_whisker_msg.representation = self.which_representation
 
             row_num = 0
             col_num = 0
@@ -68,7 +93,6 @@ class WhiskerPublisher(Node):
                 whisker_msg.z = 0.0 # not used atm
                 all_whisker_msg.whiskers.append(whisker_msg)
                 col_num += 1
-                #print(whisker_msg)
                 if col_num == 8:
                     row_num += 1
                     col_num = 0

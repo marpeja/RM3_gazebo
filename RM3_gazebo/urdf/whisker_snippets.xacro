@@ -12,8 +12,8 @@
   <xacro:property name="whisker_radius" value="0.002"/>
   <xacro:property name="whisker_array_mass" value="2.75"/>
 
-  <xacro:property name="whisker_damping" value="0.1"/>
-  <xacro:property name="whisker_friction" value="0.01"/>
+  <xacro:property name="whisker_damping" value="2.0"/>
+  <xacro:property name="whisker_friction" value="0.0"/>
   <xacro:property name="whisker_revolute_effort_limit" value="0.1"/>
   <xacro:property name="whisker_revolute_vel_limit" value="${pi/2.0}"/>
 
@@ -123,20 +123,20 @@
 
       <gazebo reference="${name}_whisker_${id}_x">
           <implicitSpringDamper>true</implicitSpringDamper>
-          <springStiffness>1.0</springStiffness>
+          <springStiffness>5.7</springStiffness>
           <springReference>0.0</springReference>
       </gazebo>
 
       <gazebo reference="${name}_whisker_${id}_y">
           <implicitSpringDamper>true</implicitSpringDamper>
-          <springStiffness>1.0</springStiffness>
+          <springStiffness>5.7</springStiffness>
           <springReference>0.0</springReference>
       </gazebo>
 
       <gazebo reference="${name}_whisker_y_link_${id}">
         <material>Gazebo/White</material>
-        <mu1>0.2</mu1>
-        <mu2>0.2</mu2>
+        <mu1>0</mu1>
+        <mu2>0</mu2>
       </gazebo>
 
 

@@ -92,7 +92,8 @@ def generate_launch_description():
             package='rm3_gazebo',
             executable='whisker_state_publisher.py',
             name='whiskerStates',
-            output='screen'
+            output='screen',
+            parameters=[{'which_representation': "Cartesian"}]
         ),
 
         RegisterEventHandler(
