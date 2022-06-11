@@ -38,6 +38,7 @@ install(DIRECTORY
 install(PROGRAMS
     scripts/motor_to_body_vel.py
     scripts/whisker_state_publisher.py
+    scripts/whisker_state_visualizer.py
     DESTINATION lib/${PROJECT_NAME}
 )
 
