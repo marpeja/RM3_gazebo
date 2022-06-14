@@ -112,7 +112,7 @@
 
     <!-- Whisker arrays in the bottom-->
     <xacro:whisker_array name="0_bottom_right_right">
-      <origin xyz="0 ${-0.05 - 0.11} 0.275"
+      <origin xyz="0 ${-0.16} 0.275"
               rpy="${pi} 0 0" />
     </xacro:whisker_array>
 
@@ -127,7 +127,7 @@
     </xacro:whisker_array>
 
     <xacro:whisker_array name="3_bottom_left_left">
-      <origin xyz="0 ${0.05 + 0.11} 0.275"
+      <origin xyz="0 ${0.16} 0.275"
               rpy="${pi} 0 0" />
     </xacro:whisker_array>
 

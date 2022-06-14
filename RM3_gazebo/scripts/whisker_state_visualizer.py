@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Node to subscribe to WhiskerStates and publish the end-tip location as
+Node to subscribe to WhiskerStates and publish the end-tip locations as
 a point cloud map.
 
 @author: Walid Remmas
@@ -42,30 +42,27 @@ import numpy as np
 
 
 class WhiskerVisualizer(Node):
-    """Docstring
-
-    more docstring
+    """Class that helps to publish and visualize the whisker states as point clouds in RViz
     """
 
     def __init__(self):
         super().__init__('whisker_state_visualizer')
 
-        self.create_subscription(WhiskerArray, '/WhiskerStates', self.WhiskerStateCallback, 10)
-        self.create_subscription(Odometry, '/odom/unfiltered', self.OdomCallback, 10)
 
-        self.whisker_pc_pub = self.create_publisher(PointCloud, '/WhikserPointCloud', 10)
+        self.whisker_pc_local_pub = self.create_publisher(PointCloud, '/WhikserPointCloud', 10)
+
         self.pose = None
         self.gotOdom = False
 
         ## Whikser parameters
         # -------------------------------------------------------------------
         self.whisker_length = 0.15
-        self.whisker_array_angle = 2.15 - np.pi/2 # inclination of sides whiskers in rads
+        self.whisker_array_angle = np.pi -  2.15  # inclination of sides whiskers in rads
 
         # pos of side whiskers biases in robot_frame
-        whisker_array_x = 0.39
-        whisker_array_y = 0.33
-        whisker_array_z = 0.32
+        whisker_array_x = 0.405
+        whisker_array_y = 0.35
+        whisker_array_z = 0.33
 
 
         self.whisker_x = -0.0345
@@ -73,8 +70,6 @@ class WhiskerVisualizer(Node):
         # bottom whiskers:
         self.whisker_y = 0.001
         self.whisker_z = 0.02
-        # side whiskers:
-        self.whisker_array_coeff = 0.032
 
         self.array_location = {0: [0, -0.16, 0.275], 1: [0, -0.05, 0.275],
                                2: [0,  0.05, 0.275], 3: [0,  0.16, 0.275],
@@ -84,21 +79,21 @@ class WhiskerVisualizer(Node):
                                7: [ whisker_array_x,  0, whisker_array_z]}
 
         # an orientation multiplication is needed for side arrays
-        rotation_x = self.rotateHomogeneous('x', self.whisker_array_angle)
+        rotation_x = self.rotateHomogeneous('x', -self.whisker_array_angle)
         rotation_y = self.rotateHomogeneous('y', self.whisker_array_angle)
         rotation_z = self.rotateHomogeneous('z', np.pi/2)
 
-        self.array_orinetation = {4: rotation_x,
-                                  5: -rotation_x,
-                                  6: np.dot(rotation_y, rotation_z),
-                                  7: np.dot(-rotation_y, rotation_z)}
-        self.viz_thershold = 0.05
+        self.array_orinetation = {4: self.rotateHomogeneous('x', -self.whisker_array_angle),
+                                  5: self.rotateHomogeneous('x', self.whisker_array_angle),
+                                  6: self.rotateHomogeneous('y', self.whisker_array_angle),
+                                  7: self.rotateHomogeneous('y', -self.whisker_array_angle)}
         # -------------------------------------------------------------------
-
+        self.create_subscription(WhiskerArray, '/WhiskerStates', self.WhiskerStateCallback, 10)
+        self.create_subscription(Odometry, '/odom/unfiltered', self.OdomCallback, 10)
 
     def OdomCallback(self, msg):
-        self.pose = msg.pose.pose.position
-        self.gotOdom = True
+        if not self.gotOdom:
+            self.gotOdom = True
 
     def WhiskerStateCallback(self, msg):
 
@@ -106,63 +101,105 @@ class WhiskerVisualizer(Node):
             pc = PointCloud()
             pc.header.stamp = self.get_clock().now().to_msg()
             pc.header.frame_id = "base_link"
+
             for i in range(len(msg.whiskers)):
                 point = Point32()
 
                 whisker = msg.whiskers[i]
 
-                # This applies for bottom whiskers
-                if whisker.pos.row_num < 4:
-                    whisker_pos = np.array([self.whisker_x + (whisker.pos.col_num-3)*self.whisker_x_bias,
-                                    self.whisker_y,
-                                    -self.whisker_z])
-                    whisker_pos += np.array(self.array_location[whisker.pos.row_num])
+                # Publish only when a deflection is detected
+                if (whisker.x**2 + whisker.y**2) > 0.02:
+                    # This applies for bottom whiskers
+                    if whisker.pos.row_num < 4:
+                        whisker_pos = np.array([self.whisker_x + (whisker.pos.col_num-3)*self.whisker_x_bias,
+                                        self.whisker_y,
+                                        -self.whisker_z])
+                        whisker_pos += np.array(self.array_location[whisker.pos.row_num])
 
-                    tip_position = [self.whisker_length * np.cos(whisker.y)*np.sin(whisker.x),
-                                    self.whisker_length * np.sin(whisker.y)*np.sin(whisker.x),
-                                    -self.whisker_length * np.cos(whisker.x)]
+                        tip_position = [self.whisker_length * np.sin(whisker.x),
+                                        self.whisker_length * np.sin(whisker.y)*np.cos(whisker.x),
+                                        -self.whisker_length * np.cos(whisker.x)*np.cos(whisker.y)]
 
-                    whisker_tip = whisker_pos + tip_position
-                    point.x = whisker_tip[0]
-                    point.y = whisker_tip[1]
-                    point.z = whisker_tip[2]
-                    pc.points.append(point)
+                        whisker_tip = whisker_pos + tip_position
+                        point.x = whisker_tip[0]
+                        point.y = whisker_tip[1]
+                        point.z = whisker_tip[2]
+                        pc.points.append(point)
 
-                """
-                # This applies for left and right arrays
-                elif whisker.pos.row_num == 4:
-                    whisker_pos = np.array([self.whisker_x + (whisker.pos.col_num-3)*self.whisker_x_bias,
-                                    -self.whisker_y,
-                                    self.whisker_z])
+                    # This applies for left and right whiskers
+                    elif whisker.pos.row_num < 6:
+                        whisker_pos = np.zeros(4)
+                        whisker_tip = np.zeros(4)
 
-                    # whisker_pos = np.dot(self.array_orinetation[whisker.pos.row_num][0:3,0:3], whisker_pos)
-                    whisker_pos += np.array(self.array_location[whisker.pos.row_num])
-                    whisker_pos += [0.0, -self.whisker_array_coeff * np.sin(self.whisker_array_angle), -self.whisker_array_coeff * np.cos(self.whisker_array_angle)]
+                        whisker_pos = np.array([self.whisker_x + (whisker.pos.col_num-3)*self.whisker_x_bias,
+                                        self.whisker_y,
+                                        -self.whisker_z])
 
-                    tip_position = [self.whisker_length * np.cos(whisker.y)*np.sin(whisker.x),
-                                      -self.whisker_length * (np.sin(whisker.y)*np.sin(whisker.x) +np.cos(self.whisker_array_angle) ),
-                                      -self.whisker_length * (np.cos(-whisker.x)-np.sin(self.whisker_array_angle))]
-                    # whisker_pos += np.dot(self.array_orinetation[whisker.pos.row_num][0:3,0:3], whisker_pos)
+                        whisker_pos += np.array(self.array_location[whisker.pos.row_num])
 
-                    #
-                    # tip_position = np.dot(self.array_orinetation[whisker.pos.row_num][0:3,0:3], tip_position)
+                        tip_position = [self.whisker_length * np.sin(whisker.x),
+                                        self.whisker_length * np.sin(whisker.y)*np.cos(whisker.x),
+                                        -self.whisker_length * np.cos(whisker.x)*np.cos(whisker.y)]
 
-                    whisker_tip = whisker_pos + tip_position
+                        whisker_tip_hom = np.array([tip_position[0], tip_position[1], tip_position[2], 1.0])
 
-                    # # print("whisker_pos:", whisker_pos)
-                    # # print("tip_position:", tip_position)
-                    # whisker_tip = whisker_pos + tip_position
+                        whisker_tip_transformed = np.dot(self.translateHomogeneous(whisker_pos),
+                                                         np.dot(self.array_orinetation[whisker.pos.row_num], whisker_tip_hom))
 
-                    # print(whisker_tip)
-                    point.x = whisker_tip[0]
-                    point.y = whisker_tip[1]
-                    point.z = whisker_tip[2]
-                    pc.points.append(point)
-                """
-            self.whisker_pc_pub.publish(pc)
+                        point.x = whisker_tip_transformed[0]
+                        point.y = whisker_tip_transformed[1]
+                        point.z = whisker_tip_transformed[2]
+                        pc.points.append(point)
+
+                    # This applies for rear and front whiskers arrays
+                    elif whisker.pos.row_num < 8:
+                        whisker_pos = np.zeros(4)
+                        whisker_tip = np.zeros(4)
+
+                        whisker_pos = np.array([self.whisker_y,
+                                        self.whisker_x + (whisker.pos.col_num-3)*self.whisker_x_bias,
+                                        -self.whisker_z])
+
+                        whisker_pos += np.array(self.array_location[whisker.pos.row_num])
+
+                        tip_position = [-self.whisker_length * np.sin(whisker.y)*np.cos(whisker.x),
+                                        self.whisker_length * np.sin(whisker.x),
+                                        -self.whisker_length * np.cos(whisker.x)*np.cos(whisker.y)]
+
+                        whisker_tip_hom = np.array([tip_position[0], tip_position[1], tip_position[2], 1.0])
+
+                        whisker_tip_transformed = np.dot(self.translateHomogeneous(whisker_pos),
+                                                         np.dot(self.array_orinetation[whisker.pos.row_num], whisker_tip_hom))
+
+                        point.x = whisker_tip_transformed[0]
+                        point.y = whisker_tip_transformed[1]
+                        point.z = whisker_tip_transformed[2]
+                        pc.points.append(point)
+
+                self.whisker_pc_local_pub.publish(pc)
+
+
+    def translateHomogeneous(self, translation):
+        """
+        Function to translate a point in space
+        @input: translation -- (3x1) vector of translation [x,y,z]
+        @return: Homogeneous translation matrix
+        """
+        R = np.array([[1.0, 0.0, 0.0, translation[0]], \
+                      [0.0, 1.0, 0.0, translation[1]],\
+                      [0.0, 0.0, 1.0, translation[2]], \
+                      [0.0, 0.0, 0.0, 1.0]])
+
+        return R
 
 
     def rotateHomogeneous(self, axis, angle):
+        """
+        Function to rotate a point in space
+        @input: axis -- name of axis of rotation "x", "y" or "z"
+        @input: angle --  amount of rotation in rads
+        @return: Homogeneous rotation matrix
+        """
         R = np.eye(4)
         a = angle
         if axis == 'x':

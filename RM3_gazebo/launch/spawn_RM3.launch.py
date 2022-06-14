@@ -37,10 +37,10 @@ def generate_launch_description():
                     {'which_sim': 'gazebo'}]
         )
 
-    gazebo_ros2_control_demos_path = os.path.join(
+    rm3_gazebo_path = os.path.join(
         get_package_share_directory('rm3_gazebo'))
 
-    xacro_file = os.path.join(gazebo_ros2_control_demos_path,
+    xacro_file = os.path.join(rm3_gazebo_path,
                               'urdf',
                               'RM3_robot.xacro.urdf')
 

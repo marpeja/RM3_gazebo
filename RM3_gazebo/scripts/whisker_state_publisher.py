@@ -12,6 +12,11 @@ import rclpy
 from rclpy.node import Node
 from robominer_msgs.msg import WhiskerArray, Whisker
 from sensor_msgs.msg import JointState
+from geometry_msgs.msg import Point32, TransformStamped
+from nav_msgs.msg import Odometry
+
+from tf2_ros import TransformBroadcaster
+
 
 import numpy as np
 
@@ -39,21 +44,24 @@ import numpy as np
 
 
 class WhiskerPublisher(Node):
-    """Docstring
-
-    more docstring
+    """Class that publishes the states of whisker angles.
     """
 
     def __init__(self):
         super().__init__('whisker_state_publisher')
-
-        self.create_subscription(JointState, '/joint_states', self.JointStateCallback, 10)
 
         self.whisker_pub = self.create_publisher(WhiskerArray, '/WhiskerStates', 10)
         self.whisker_total = 64
         self.declare_parameter('which_representation')
         self.which_representation = self.get_parameter('which_representation').value
         self.whisker_length = 0.15
+
+        self.br = TransformBroadcaster(self)
+        self.gotOdom = False
+
+        self.create_subscription(Odometry, '/odom/unfiltered', self.OdomCallback, 10)
+        self.create_subscription(JointState, '/joint_states', self.JointStateCallback, 10)
+
 
     def JointStateCallback(self, msg):
         # making sure the jointState message contains all joints (128 for whiskers + 4 screws)
@@ -98,6 +106,28 @@ class WhiskerPublisher(Node):
                     col_num = 0
 
             self.whisker_pub.publish(all_whisker_msg)
+
+    def OdomCallback(self, msg):
+        position = msg.pose.pose.position
+        orientation = msg.pose.pose.orientation
+
+        t = TransformStamped()
+
+        t.header.stamp = self.get_clock().now().to_msg()
+        t.header.frame_id = 'world'
+        t.child_frame_id = 'base_link'
+
+        t.transform.translation.x = position.x
+        t.transform.translation.y = position.y
+        t.transform.translation.z = position.z
+
+        t.transform.rotation.x = orientation.x
+        t.transform.rotation.y = orientation.y
+        t.transform.rotation.z = orientation.z
+        t.transform.rotation.w = orientation.w
+
+        # Send the transformation
+        self.br.sendTransform(t)
 
 def main(args=None):
     rclpy.init(args=args)
