@@ -8,7 +8,7 @@
   <xacro:property name="whisker_mesh_file" value="file://$(find rm3_gazebo)/urdf/meshes/whisker.dae"/>
   <xacro:property name="whisker_array_mesh_file" value="file://$(find rm3_gazebo)/urdf/meshes/whisker_array.dae"/>
 
-  <xacro:property name="whisker_length" value="0.150"/>
+  
   <xacro:property name="whisker_radius" value="0.002"/>
   <xacro:property name="whisker_array_mass" value="2.75"/>
 
@@ -39,7 +39,7 @@
 
 
  <!-- WHISKER DEFITION -->
-  <xacro:macro name="whisker" params="name id parent *origin">
+  <xacro:macro name="whisker" params="name id parent length *origin">
       <!-- Magnet around x axis is connected to base_array and rotating around x-->
       <joint name="${name}_whisker_${id}_x" type="revolute">
           <xacro:insert_block name="origin"/>
@@ -105,18 +105,18 @@
                         izz="${(1.0/12.0) * magnet_mass * (magnet_size_y ** 2 + magnet_size_x ** 2)}"/>
           </inertial>
           <visual>
-              <origin xyz="0 0 ${whisker_length/2}"
+              <origin xyz="0 0 ${length/2}"
                       rpy="0 0 0" />
               <geometry>
-                <cylinder radius="${whisker_radius}" length="${whisker_length}"/>
+                <cylinder radius="${whisker_radius}" length="${length}"/>
               </geometry>
           </visual>
 
           <collision>
-              <origin xyz="0 0 ${whisker_length/2}"
+              <origin xyz="0 0 ${length/2}"
                       rpy="0 0 0" />
               <geometry>
-                <cylinder radius="${whisker_radius}" length="${whisker_length}"/>
+                <cylinder radius="${whisker_radius}" length="${length}"/>
               </geometry>
           </collision>
       </link>
@@ -152,7 +152,7 @@
 
 
  <!-- WHISKER ARRAY DEFITION -->
-  <xacro:macro name="whisker_array" params="name *origin">
+  <xacro:macro name="whisker_array" params="name whisker_length *origin">
       <joint name="${name}_whisker_array" type="fixed">
           <xacro:insert_block name="origin"/>
           <parent link="chassis"/>
@@ -183,42 +183,42 @@
       </gazebo>
 
       <!-- whisker #1 -->
-      <xacro:whisker name="${name}" id = "1" parent= "${name}_whisker_array_link" >
+      <xacro:whisker name="${name}" id = "1" parent= "${name}_whisker_array_link" length = "${whisker_length}">
         <origin xyz="${whisker_x + -3*whisker_x_bias} ${whisker_y} ${whisker_z}"
                 rpy="0 0 0" />
       </xacro:whisker>
       <!-- whisker #2 -->
-      <xacro:whisker name="${name}" id = "2" parent= "${name}_whisker_array_link" >
+      <xacro:whisker name="${name}" id = "2" parent= "${name}_whisker_array_link" length = "${whisker_length}" >
         <origin xyz="${whisker_x + -2*whisker_x_bias} ${whisker_y} ${whisker_z}"
                 rpy="0 0 0" />
       </xacro:whisker>
       <!-- whisker #3 -->
-      <xacro:whisker name="${name}" id = "3" parent= "${name}_whisker_array_link" >
+      <xacro:whisker name="${name}" id = "3" parent= "${name}_whisker_array_link" length = "${whisker_length}">
         <origin xyz="${whisker_x + -whisker_x_bias} ${whisker_y} ${whisker_z}"
                 rpy="0 0 0" />
       </xacro:whisker>
       <!-- whisker #4 -->
-      <xacro:whisker name="${name}" id = "4" parent= "${name}_whisker_array_link" >
+      <xacro:whisker name="${name}" id = "4" parent= "${name}_whisker_array_link" length = "${whisker_length}">
         <origin xyz="${whisker_x + -0*whisker_x_bias} ${whisker_y} ${whisker_z}"
                 rpy="0 0 0" />
       </xacro:whisker>
       <!-- whisker #5 -->
-      <xacro:whisker name="${name}" id = "5" parent= "${name}_whisker_array_link" >
+      <xacro:whisker name="${name}" id = "5" parent= "${name}_whisker_array_link" length = "${whisker_length}">
         <origin xyz="${whisker_x + whisker_x_bias} ${whisker_y} ${whisker_z}"
                 rpy="0 0 0" />
       </xacro:whisker>
       <!-- whisker #6 -->
-      <xacro:whisker name="${name}" id = "6" parent= "${name}_whisker_array_link" >
+      <xacro:whisker name="${name}" id = "6" parent= "${name}_whisker_array_link" length = "${whisker_length}">
         <origin xyz="${whisker_x + 2*whisker_x_bias} ${whisker_y} ${whisker_z}"
                 rpy="0 0 0" />
       </xacro:whisker>
       <!-- whisker #7 -->
-      <xacro:whisker name="${name}" id = "7" parent= "${name}_whisker_array_link" >
+      <xacro:whisker name="${name}" id = "7" parent= "${name}_whisker_array_link" length = "${whisker_length}">
         <origin xyz="${whisker_x + 3*whisker_x_bias} ${whisker_y} ${whisker_z}"
                 rpy="0 0 0" />
       </xacro:whisker>
       <!-- whisker #8 -->
-      <xacro:whisker name="${name}" id = "8" parent= "${name}_whisker_array_link" >
+      <xacro:whisker name="${name}" id = "8" parent= "${name}_whisker_array_link" length = "${whisker_length}">
         <origin xyz="${whisker_x + 4*whisker_x_bias} ${whisker_y} ${whisker_z}"
                 rpy="0 0 0" />
       </xacro:whisker>

@@ -26,7 +26,7 @@ import xacro
 def generate_launch_description():
 
     world_path = PathJoinSubstitution(
-        [FindPackageShare("rm3_gazebo"), "worlds", "boxes_world.world"]
+        [FindPackageShare("rm3_gazebo"), "worlds", "cave_world.world"]
     )
     steering_node = launch_ros.actions.Node(
         package='robominer_locomotion_control',
