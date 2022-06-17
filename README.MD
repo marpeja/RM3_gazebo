@@ -92,3 +92,27 @@ To enable or disable the simulation of the whiskers on the robot, simply edit th
 
 ## Enabling / Disabling RGB-D camera on the robot:
 if you want to use the camera make sure to enable it on the file "_/urdf/RM3_robot.xacro.urdf_", and set the xacro:property "_enableCamera_" to "_enable_". colcon build the package for changes to take effect.
+
+## RTABMAP for SLAM mapping using an rgb-d camera
+We currently use RTABMAP for SLAM using the on-board camera (Realsense D455). To use it on the simulator also, you need to get the RTABMAP package for ROS2.
+
+```
+cd ~/dev_ws/src
+git clone –branch foxy-devel https://github.com/introlab/rtabmap.git
+git clone --branch foxy-devel https://github.com/introlab/rtabmap_ros.git
+export MAKEFLAGS="-j2" # Can be ignored if you have a lot of RAM (>16GB)
+colcon build --symlink-install
+```
+To launch the SLAM nodes, run:
+
+```
+ros2 launch rm3_gazebo RM3_RTABMAP.launch.py
+```
+To visualize the point cloud in Rviz2, you need to set the fixed frame to '_map_' instead of '_world_'
+
+
+## Known bugs:
+When running '_ros2 launch rm3_gazebo spawn_RM3.launch.py_', if you get an error saying '*.py' not found on the libexec directory. It means you need to make the python scripts executable. To do so:
+```
+sudo chmod +x ~/dev_ws/src/robominer_taltech/RM3_gazebo/scripts/*.py
+```
