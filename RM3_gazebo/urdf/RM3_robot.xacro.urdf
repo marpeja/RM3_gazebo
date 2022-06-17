@@ -21,11 +21,21 @@
   <xacro:property name="bottom_whisker_length" value="0.150"/>
   <xacro:property name="side_whisker_length" value="0.20"/>
 
+  <!--Camera mass and dimension properties -->
+  <xacro:property name="enableCamera" value="enable"/>
+  <xacro:property name="camera_mass" value="0.564"/>
+  <xacro:property name="camera_collision_box_x" value="0.125"/>
+  <xacro:property name="camera_collision_box_y" value="0.025"/>
+  <xacro:property name="camera_collision_box_z" value="0.03"/>
+  <xacro:property name="camera_angle" value="0.0"/>
 
-  <link name="base_link">
+
+
+   <link name="base_link">
    </link>
 
    <joint name="dummy_joint" type="fixed">
+     <origin xyz="0.0 0.0 -0.32" rpy="0.0 0.0 0.0"/>
      <parent link="base_link"/>
      <child link="chassis"/>
    </joint>
@@ -71,6 +81,47 @@
     <kd value="1.0" />
     <material>Gazebo/Grey</material>
   </gazebo>
+
+  <!-- Real-sense-camera mesh -->
+  <xacro:if value="${enableCamera == 'enable'}">
+
+      <link name="realsense_camera">
+          <inertial>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <mass value="${camera_mass}"/>
+            <inertia
+              ixx="${(1.0/12.0) * camera_mass * (camera_collision_box_y ** 2 + camera_collision_box_z ** 2)}"
+              ixy="0.0"
+              ixz="0.0"
+              iyy="${(1.0/12.0) * camera_mass * (camera_collision_box_x ** 2 + camera_collision_box_z ** 2)}"
+              iyz="0.0"
+              izz="${(1.0/12.0) * camera_mass * (camera_collision_box_y ** 2 + camera_collision_box_x ** 2)}"/>
+          </inertial>
+
+        <collision>
+          <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 1.57"/>
+          <geometry>
+            <box size="${camera_collision_box_x} ${camera_collision_box_y} ${camera_collision_box_z}" />
+          </geometry>
+        </collision>
+
+        <visual>
+          <origin xyz="-0.02 0.0 0.0" rpy="0.0 0.0 1.57"/>
+          <geometry>
+            <mesh filename="file://$(find rm3_gazebo)/urdf/meshes/realsense.dae"/>
+          </geometry>
+        </visual>
+      </link>
+
+
+      <joint name="camera_joint" type="fixed">
+        <origin xyz="0.38 0.0 0.0" rpy="0 ${camera_angle} 0.0" />
+        <parent link="base_link"/>
+        <child link="realsense_camera"/>
+      </joint>
+
+  </xacro:if>
+
   <!-- FR screw -->
   <xacro:screw name="FR">
     <origin xyz="0.01 -0.305 0.148" rpy="0 0 0" />
@@ -161,7 +212,7 @@
     </ros>
     <command_topic>cmd_vel</command_topic>
     <odometry_topic>odom/unfiltered</odometry_topic>
-    <odometry_frame>odom</odometry_frame>
+    <odometry_frame>world</odometry_frame>
     <odometry_rate>20.0</odometry_rate>
     <robot_base_frame>base_link</robot_base_frame>
     <publish_odom>true</publish_odom>
@@ -170,6 +221,6 @@
 </gazebo>
 
 <!-- Add sensors blocs -->
-<xacro:robot_sensors parent="base_link"/>
+<xacro:robot_sensors parent="base_link" enableCamera = "${enableCamera}"/>
 
 </robot>

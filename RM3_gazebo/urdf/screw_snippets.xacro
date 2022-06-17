@@ -35,15 +35,15 @@
       <link name="${name}_screw_link">
         <inertial>
             <xacro:if value="${name == 'BR' or name == 'FL'}">
-                 <origin xyz="-0.17 0.0 0.0" rpy="0 1.57 0"/>
+                 <origin xyz="-0.05 0.0 0.0" rpy="0 1.57 0"/>
             </xacro:if>
             <xacro:if value="${name == 'FR' or name == 'BL'}">
-                 <origin xyz="0.17 0.0 0.0" rpy="0 1.57 0"/>
+                 <origin xyz="0.05 0.0 0.0" rpy="0 1.57 0"/>
             </xacro:if>
           <mass value="${screw_mass / 100}" />
-          <inertia ixx="${(1.0 / 12.0) * screw_mass / 100 * (3 * screw_collision_radius ** 2 + screw_collision_height **2)}"
-                   iyy="${(1.0 / 12.0) * screw_mass / 100 * (3 * screw_collision_radius ** 2 + screw_collision_height **2)}"
-                   izz="${(1.0 / 12.0) * screw_mass / 100 * screw_collision_radius ** 2}"
+          <inertia ixx="${(1.0 / 12.0) * screw_mass / 100 * (3 * 0.01 ** 2 + 0.25 **2)}"
+                   iyy="${(1.0 / 12.0) * screw_mass / 100 * (3 * 0.01 ** 2 + 0.25 **2)}"
+                   izz="${(1.0 / 12.0) * screw_mass / 100 * 0.01 ** 2}"
                    iyz="0.0" ixy="0.0" ixz="0.0"
                     />
        </inertial>

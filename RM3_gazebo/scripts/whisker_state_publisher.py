@@ -51,9 +51,14 @@ class WhiskerPublisher(Node):
         super().__init__('whisker_state_publisher')
 
         self.whisker_pub = self.create_publisher(WhiskerArray, '/WhiskerStates', 10)
-        self.whisker_total = 64
         self.declare_parameter('which_representation')
         self.which_representation = self.get_parameter('which_representation').value
+
+        self.declare_parameter('number_of_arrays')
+        number_of_arrays = self.get_parameter('number_of_arrays').value
+
+        self.whisker_total = 8 * number_of_arrays
+
         self.whisker_length = 0.15
 
         self.br = TransformBroadcaster(self)
@@ -111,6 +116,7 @@ class WhiskerPublisher(Node):
         position = msg.pose.pose.position
         orientation = msg.pose.pose.orientation
 
+        # base_link to world using ground truth odometry
         t = TransformStamped()
 
         t.header.stamp = self.get_clock().now().to_msg()
@@ -128,6 +134,7 @@ class WhiskerPublisher(Node):
 
         # Send the transformation
         self.br.sendTransform(t)
+
 
 def main(args=None):
     rclpy.init(args=args)

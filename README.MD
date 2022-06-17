@@ -89,3 +89,6 @@ To select a world, you need to edit the "_world_path_" variable in file "_/launc
 
 ## Enabling / Disabling Whiskers on the robot:
 To enable or disable the simulation of the whiskers on the robot, simply edit the file "_/urdf/RM3_robot.xacro.urdf_", and set the xacro:property "_enableWhiskers_" to either "_enable_" or "_disable_". colcon build the package for changes to take effect.
+
+## Enabling / Disabling RGB-D camera on the robot:
+if you want to use the camera make sure to enable it on the file "_/urdf/RM3_robot.xacro.urdf_", and set the xacro:property "_enableCamera_" to "_enable_". colcon build the package for changes to take effect.

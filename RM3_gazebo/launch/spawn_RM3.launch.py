@@ -58,9 +58,9 @@ def generate_launch_description():
     spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',
                         arguments=['-topic', 'robot_description',
                                    '-entity', 'RM3',
-                                   '-x', '0.0',
+                                   '-x', '-0.5',
                                    '-y', '0.0',
-                                   '-z', '0.05',
+                                   '-z', '0.32',
                                    ],
                         output='screen')
 
@@ -93,7 +93,8 @@ def generate_launch_description():
             executable='whisker_state_publisher.py',
             name='whiskerStates',
             output='screen',
-            parameters=[{'which_representation': "Cartesian"}]
+            parameters=[{'which_representation': "Cartesian"},
+                        {'number_of_arrays': 6}]
         ),
 
         RegisterEventHandler(

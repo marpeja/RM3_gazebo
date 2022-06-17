@@ -49,10 +49,13 @@ class WhiskerVisualizer(Node):
         super().__init__('whisker_state_visualizer')
 
 
-        self.whisker_pc_local_pub = self.create_publisher(PointCloud, '/WhikserPointCloud', 10)
+        self.whisker_pc_pub = self.create_publisher(PointCloud, '/WhikserPointCloud', 10)
 
         self.pose = None
         self.gotOdom = False
+
+        # Select either to create the pointcloud always, or only when whiskers are deflected
+        self.mapAll = True
 
         ## Whikser parameters
         # -------------------------------------------------------------------
@@ -92,24 +95,29 @@ class WhiskerVisualizer(Node):
         self.create_subscription(WhiskerArray, '/WhiskerStates', self.WhiskerStateCallback, 10)
         self.create_subscription(Odometry, '/odom/unfiltered', self.OdomCallback, 10)
 
+        self.whiskers_viz_timer_period = 0.1
+        self.pointCloud_timer = self.create_timer(self.whiskers_viz_timer_period, self.processWhiskerData)
+        self.whiskerData = []
     def OdomCallback(self, msg):
         if not self.gotOdom:
             self.gotOdom = True
 
     def WhiskerStateCallback(self, msg):
+        self.whiskerData = msg
 
+    def processWhiskerData(self):
+        # Process the whiskers data only when an odom message is received.
         if self.gotOdom:
             pc = PointCloud()
-            pc.header.stamp = self.get_clock().now().to_msg()
-            pc.header.frame_id = "base_link"
-
+            pc.header.frame_id = "chassis"
+            msg = self.whiskerData
             for i in range(len(msg.whiskers)):
                 point = Point32()
 
                 whisker = msg.whiskers[i]
 
-                # Publish only when a deflection is detected
-                if (whisker.x**2 + whisker.y**2) > 0.02 or True:
+                condition = (self.mapAll or (whisker.x**2 + whisker.y**2) > 0.02)
+                if condition:
                     # This applies for bottom whiskers
                     if whisker.pos.row_num < 4:
                         whisker_pos = np.array([self.whisker_x + (whisker.pos.col_num-3)*self.whisker_x_bias,
@@ -153,32 +161,32 @@ class WhiskerVisualizer(Node):
                         pc.points.append(point)
 
                     # This applies for rear and front whiskers arrays
-                    elif whisker.pos.row_num < 8:
-                        whisker_pos = np.zeros(4)
-                        whisker_tip = np.zeros(4)
+                    # elif whisker.pos.row_num < 8:
+                    #     whisker_pos = np.zeros(4)
+                    #     whisker_tip = np.zeros(4)
+                    #
+                    #     whisker_pos = np.array([self.whisker_y,
+                    #                     self.whisker_x + (whisker.pos.col_num-3)*self.whisker_x_bias,
+                    #                     -self.whisker_z])
+                    #
+                    #     whisker_pos += np.array(self.array_location[whisker.pos.row_num])
+                    #
+                    #     tip_position = [-self.side_whisker_length * np.sin(whisker.y)*np.cos(whisker.x),
+                    #                     self.side_whisker_length * np.sin(whisker.x),
+                    #                     -self.side_whisker_length * np.cos(whisker.x)*np.cos(whisker.y)]
+                    #
+                    #     whisker_tip_hom = np.array([tip_position[0], tip_position[1], tip_position[2], 1.0])
+                    #
+                    #     whisker_tip_transformed = np.dot(self.translateHomogeneous(whisker_pos),
+                    #                                      np.dot(self.array_orinetation[whisker.pos.row_num], whisker_tip_hom))
+                    #
+                    #     point.x = whisker_tip_transformed[0]
+                    #     point.y = whisker_tip_transformed[1]
+                    #     point.z = whisker_tip_transformed[2]
+                    #     pc.points.append(point)
 
-                        whisker_pos = np.array([self.whisker_y,
-                                        self.whisker_x + (whisker.pos.col_num-3)*self.whisker_x_bias,
-                                        -self.whisker_z])
-
-                        whisker_pos += np.array(self.array_location[whisker.pos.row_num])
-
-                        tip_position = [-self.side_whisker_length * np.sin(whisker.y)*np.cos(whisker.x),
-                                        self.side_whisker_length * np.sin(whisker.x),
-                                        -self.side_whisker_length * np.cos(whisker.x)*np.cos(whisker.y)]
-
-                        whisker_tip_hom = np.array([tip_position[0], tip_position[1], tip_position[2], 1.0])
-
-                        whisker_tip_transformed = np.dot(self.translateHomogeneous(whisker_pos),
-                                                         np.dot(self.array_orinetation[whisker.pos.row_num], whisker_tip_hom))
-
-                        point.x = whisker_tip_transformed[0]
-                        point.y = whisker_tip_transformed[1]
-                        point.z = whisker_tip_transformed[2]
-                        pc.points.append(point)
-
-                self.whisker_pc_local_pub.publish(pc)
-
+            pc.header.stamp = self.get_clock().now().to_msg()
+            self.whisker_pc_pub.publish(pc)
 
     def translateHomogeneous(self, translation):
         """
