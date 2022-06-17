@@ -14,6 +14,8 @@ import rclpy
 from rclpy.node import Node
 from robominer_msgs.msg import MotorModuleCommand
 from geometry_msgs.msg import Twist
+from std_msgs.msg import Float64, Float64MultiArray
+
 
 import numpy as np
 from math import pi, tan
@@ -54,9 +56,11 @@ class MotorToBodyVel(Node):
         self.create_subscription(MotorModuleCommand, '/motor3/motor_rpm_setpoint', self.front_left, 10)
 
         self.cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
+        self.publisher_screw_rotation = self.create_publisher(Float64MultiArray, '/velocity_controller/commands', 10)
 
         self.kinematics_timer_period = 0.1  # seconds
         self.kinematics_timer = self.create_timer(self.kinematics_timer_period, self.motor_to_body_vel)
+
 
     def front_right(self, msg):
         self.fr_vel = msg.motor_rpm_goal
@@ -74,6 +78,16 @@ class MotorToBodyVel(Node):
         self.fl_vel = msg.motor_rpm_goal
         # self.get_logger().info(f'front_left: {self.fl_vel}')
 
+    def visualizeScrewsInGazebo(self):
+        screw_velocities = Float64MultiArray()
+        # A division by a factor was necessary to convert rad/s to whatever is used in velocity controller in gazebo.
+        velCorrection = 3766.86341 # this depends on the step size of the solver.
+        screw_velocities.data.append(-int(self.fr_vel) * self.rpm_to_radpersec / velCorrection)
+        screw_velocities.data.append(int(self.rr_vel) * self.rpm_to_radpersec / velCorrection)
+        screw_velocities.data.append(-int(self.rl_vel) * self.rpm_to_radpersec / velCorrection)
+        screw_velocities.data.append(int(self.fl_vel) * self.rpm_to_radpersec / velCorrection)
+        self.publisher_screw_rotation.publish(screw_velocities)
+
     def motor_to_body_vel(self):
         body_vel = Twist()
 
@@ -85,6 +99,10 @@ class MotorToBodyVel(Node):
         body_vel.linear.y = self.robot_twist[1] * self.lin_speed_multiplier
         body_vel.angular.z = self.robot_twist[2] * self.ang_speed_multiplier
         self.cmd_vel_pub.publish(body_vel)
+
+        self.visualizeScrewsInGazebo()
+
+
 
 
 def main(args=None):

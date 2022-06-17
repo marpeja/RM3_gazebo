@@ -98,16 +98,20 @@ class WhiskerVisualizer(Node):
         self.whiskers_viz_timer_period = 0.1
         self.pointCloud_timer = self.create_timer(self.whiskers_viz_timer_period, self.processWhiskerData)
         self.whiskerData = []
+        self.gotWhiskers = False
+        
     def OdomCallback(self, msg):
         if not self.gotOdom:
             self.gotOdom = True
 
     def WhiskerStateCallback(self, msg):
         self.whiskerData = msg
+        if not self.gotWhiskers:
+            self.gotWhiskers = True
 
     def processWhiskerData(self):
         # Process the whiskers data only when an odom message is received.
-        if self.gotOdom:
+        if self.gotOdom and self.gotWhiskers:
             pc = PointCloud()
             pc.header.frame_id = "chassis"
             msg = self.whiskerData

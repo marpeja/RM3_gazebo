@@ -25,6 +25,7 @@ import xacro
 
 def generate_launch_description():
 
+
     world_path = PathJoinSubstitution(
         [FindPackageShare("rm3_gazebo"), "worlds", "cave_world.world"]
     )
@@ -34,7 +35,8 @@ def generate_launch_description():
         name='open_loop_steering',
         output='screen',
         parameters=[{'on_robot': False},
-                    {'which_sim': 'gazebo'}]
+                    {'which_sim': 'gazebo'},
+                    ]
         )
 
     rm3_gazebo_path = os.path.join(
@@ -67,16 +69,21 @@ def generate_launch_description():
     load_joint_state_controller = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'start',
              'joint_state_broadcaster'],
-        output='screen'
+        output='screen',
     )
 
     load_joint_trajectory_controller = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'start',
              'velocity_controller'],
-        output='screen'
+        output='screen',
     )
 
+
+
+
     return LaunchDescription([
+
+
         ExecuteProcess(
             cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so',  '-s', 'libgazebo_ros_init.so', world_path],
             output='screen'
@@ -85,7 +92,7 @@ def generate_launch_description():
             package='rm3_gazebo',
             executable='motor_to_body_vel.py',
             name='motor2bodyvel',
-            output='screen'
+            output='screen',
         ),
 
         Node(
@@ -93,8 +100,16 @@ def generate_launch_description():
             executable='whisker_state_publisher.py',
             name='whiskerStates',
             output='screen',
-            parameters=[{'which_representation': "Cartesian"},
-                        {'number_of_arrays': 6}]
+            parameters=[{'which_representation': "Spherical"},
+                        {'number_of_arrays': 6},
+                        ]
+        ),
+
+        Node(
+            package='rm3_gazebo',
+            executable='whisker_state_visualizer.py',
+            name='whiskerPointCloud',
+            output='screen',
         ),
 
         RegisterEventHandler(

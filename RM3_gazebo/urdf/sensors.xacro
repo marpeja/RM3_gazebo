@@ -76,16 +76,16 @@
                     </image>
                     <clip>
                         <near>0.05</near>
-                        <far>3</far>
+                        <far>10</far>
                     </clip>
                 </camera>
                 <plugin name="depth_camera_controller" filename="libgazebo_ros_camera.so">
                     <baseline>0.2</baseline>
                     <alwaysOn>true</alwaysOn>
                     <updateRate>0.0</updateRate>
-                    <frame_name>realsense_camera</frame_name>
-                    <pointCloudCutoff>0.5</pointCloudCutoff>
-                    <pointCloudCutoffMax>3.0</pointCloudCutoffMax>
+                    <frame_name>camera_frame</frame_name>
+                    <pointCloudCutoff>0.2</pointCloudCutoff>
+                    <pointCloudCutoffMax>10.0</pointCloudCutoffMax>
                     <distortionK1>0</distortionK1>
                     <distortionK2>0</distortionK2>
                     <distortionK3>0</distortionK3>

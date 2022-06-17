@@ -52,12 +52,12 @@ def generate_launch_description():
 
         # Nodes to launch
 
-        Node(
-            package="tf2_ros",
-            executable="static_transform_publisher",
-            output="screen" ,
-            arguments=["0.0", "0.0", "0.0", "-1.57", "0", "-1.57", "realsense_camera", "map"]
-        ),
+        # Node(
+        #     package="tf2_ros",
+        #     executable="static_transform_publisher",
+        #     output="screen" ,
+        #     arguments=["0.0", "0.0", "0.0", "-1.57", "0", "-1.57", "realsense_camera", "map"]
+        # ),
 
         # SLAM mode:
         Node(
