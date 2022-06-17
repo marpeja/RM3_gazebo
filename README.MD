@@ -80,10 +80,11 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r cmd_vel:=cmd_
 ```
 
 ## Worlds in this repo:
-There are currently 3 world models:
+There are currently 4 world models:
   * empty_world: basic empty world with only ground and RM3 robot.
-  * boxes_world: World with a box in front of the robot to test whiskers collision behaviour.
+  * boxes_world: World with boxes in front of the robot to test whiskers collision behaviour.
   * terrain_world: World with an uneven terrain.
+  * cave_world: World containing a mesh of the Belgium Cave in Han-sur-Lesse.
 
 To select a world, you need to edit the "_world_path_" variable in file "_/launch/spawn_RM3.launch.py_". colcon build the package for changes to take effect.
 
