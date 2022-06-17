@@ -12,22 +12,38 @@ from ament_index_python.packages import get_package_share_directory
 import launch_ros
 
 from launch import LaunchDescription
-from launch.actions import ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler
+from launch.actions import ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler, DeclareLaunchArgument
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, Command, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
 
+from launch.conditions import IfCondition
+
+
 from launch_ros.actions import Node
 
 import xacro
 
+import yaml
+
 
 def generate_launch_description():
 
+    simulation_parameters_yaml = os.path.join(
+        get_package_share_directory('rm3_gazebo'),
+        'config',
+        'simulation_parameters.yaml'
+        )
+
+    with open(simulation_parameters_yaml, 'r') as file:
+        # The FullLoader parameter handles the conversion from YAML
+        # scalar values to Python the dictionary format
+        sim_params = yaml.load(file, Loader=yaml.FullLoader)
+
 
     world_path = PathJoinSubstitution(
-        [FindPackageShare("rm3_gazebo"), "worlds", "cave_world.world"]
+        [FindPackageShare("rm3_gazebo"), "worlds", sim_params["world"] + ".world"]
     )
     steering_node = launch_ros.actions.Node(
         package='robominer_locomotion_control',
@@ -78,16 +94,24 @@ def generate_launch_description():
         output='screen',
     )
 
-
+    enableWhiskers = LaunchConfiguration('enableWhiskers')
+    if sim_params['sensors']['whiskers']['enableWhiskers'] == "enable":
+        enableWhiskersValue = 'True'
+    else:
+        enableWhiskersValue = 'False'
 
 
     return LaunchDescription([
-
+        DeclareLaunchArgument(
+            'enableWhiskers',
+            default_value = enableWhiskersValue,
+            description='Whether to start Whisker related nodes'),
 
         ExecuteProcess(
             cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so',  '-s', 'libgazebo_ros_init.so', world_path],
             output='screen'
         ),
+
         Node(
             package='rm3_gazebo',
             executable='motor_to_body_vel.py',
@@ -100,6 +124,7 @@ def generate_launch_description():
             executable='whisker_state_publisher.py',
             name='whiskerStates',
             output='screen',
+            condition = IfCondition(enableWhiskers),
             parameters=[{'which_representation': "Spherical"},
                         {'number_of_arrays': 6},
                         ]
@@ -109,6 +134,7 @@ def generate_launch_description():
             package='rm3_gazebo',
             executable='whisker_state_visualizer.py',
             name='whiskerPointCloud',
+            condition = IfCondition(enableWhiskers),
             output='screen',
         ),
 

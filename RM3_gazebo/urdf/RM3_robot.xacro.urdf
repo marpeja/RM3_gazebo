@@ -17,17 +17,18 @@
   <xacro:property name="body_collision_box_z" value="0.05"/>
 
   <!-- Add whiskers on the robot --> <!-- "enable" or "disable" -->
-  <xacro:property name="enableWhiskers" value="enable"/>
-  <xacro:property name="bottom_whisker_length" value="0.150"/>
-  <xacro:property name="side_whisker_length" value="0.20"/>
+  <xacro:property name="yaml_file" value="$(find rm3_gazebo)/config/simulation_parameters.yaml" />
+  <xacro:property name="props" value="${load_yaml(yaml_file)}"/>
+
+  <xacro:property name="bottom_whisker_length" value="${props['sensors']['whiskers']['bottom_whisker_length']}"/>
+  <xacro:property name="side_whisker_length" value="${props['sensors']['whiskers']['side_whisker_length']}"/>
 
   <!--Camera mass and dimension properties -->
-  <xacro:property name="enableCamera" value="enable"/>
   <xacro:property name="camera_mass" value="0.564"/>
   <xacro:property name="camera_collision_box_x" value="0.125"/>
   <xacro:property name="camera_collision_box_y" value="0.025"/>
   <xacro:property name="camera_collision_box_z" value="0.03"/>
-  <xacro:property name="camera_angle" value="0.0"/>
+  <xacro:property name="camera_angle" value="${props['sensors']['camera']['camera_angle']}"/>
 
 
 
@@ -83,7 +84,7 @@
   </gazebo>
 
   <!-- Real-sense-camera mesh -->
-  <xacro:if value="${enableCamera == 'enable'}">
+  <xacro:if value="${props['sensors']['camera']['enableCamera'] == 'enable'}">
 
       <link name="camera_frame"/>
 
@@ -148,7 +149,7 @@
   </xacro:screw>
 
   <!-- Whisker arrays -->
-<xacro:if value="${enableWhiskers == 'enable'}">
+<xacro:if value="${props['sensors']['whiskers']['enableWhiskers'] == 'enable'}">
     <!-- <xacro:whisker_array name="7_front" whisker_length="${side_whisker_length}">
       <origin xyz="${whisker_array_x} 0 ${whisker_array_z}"
               rpy="${whisker_array_angle} 0 ${pi/2}" />
@@ -228,6 +229,6 @@
 </gazebo>
 
 <!-- Add sensors blocs -->
-<xacro:robot_sensors parent="base_link" enableCamera = "${enableCamera}"/>
+<xacro:robot_sensors parent="base_link" enableCamera = "${props['sensors']['camera']['enableCamera']}"/>
 
 </robot>

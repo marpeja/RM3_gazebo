@@ -13,8 +13,11 @@ import rclpy
 
 from rclpy.node import Node
 from robominer_msgs.msg import MotorModuleCommand
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, TransformStamped
 from std_msgs.msg import Float64, Float64MultiArray
+from nav_msgs.msg import Odometry
+
+from tf2_ros import TransformBroadcaster
 
 
 import numpy as np
@@ -50,16 +53,19 @@ class MotorToBodyVel(Node):
             [-1/(self.lx + 1/tan(self.screw_helix_angle) * self.ly), -1/(self.lx + 1/tan(self.screw_helix_angle) * self.ly), -1/(self.lx + 1/tan(self.screw_helix_angle) * self.ly), -1/(self.lx + 1/tan(self.screw_helix_angle) * self.ly)]
         ])
 
-        self.create_subscription(MotorModuleCommand, '/motor0/motor_rpm_setpoint', self.front_right, 10)
-        self.create_subscription(MotorModuleCommand, '/motor1/motor_rpm_setpoint', self.rear_right, 10)
-        self.create_subscription(MotorModuleCommand, '/motor2/motor_rpm_setpoint', self.rear_left, 10)
-        self.create_subscription(MotorModuleCommand, '/motor3/motor_rpm_setpoint', self.front_left, 10)
-
         self.cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
         self.publisher_screw_rotation = self.create_publisher(Float64MultiArray, '/velocity_controller/commands', 10)
 
         self.kinematics_timer_period = 0.1  # seconds
         self.kinematics_timer = self.create_timer(self.kinematics_timer_period, self.motor_to_body_vel)
+
+        self.br = TransformBroadcaster(self)
+
+        self.create_subscription(MotorModuleCommand, '/motor0/motor_rpm_setpoint', self.front_right, 10)
+        self.create_subscription(MotorModuleCommand, '/motor1/motor_rpm_setpoint', self.rear_right, 10)
+        self.create_subscription(MotorModuleCommand, '/motor2/motor_rpm_setpoint', self.rear_left, 10)
+        self.create_subscription(MotorModuleCommand, '/motor3/motor_rpm_setpoint', self.front_left, 10)
+        self.create_subscription(Odometry, '/odom/unfiltered', self.OdomCallback, 10)
 
 
     def front_right(self, msg):
@@ -101,6 +107,29 @@ class MotorToBodyVel(Node):
         self.cmd_vel_pub.publish(body_vel)
 
         self.visualizeScrewsInGazebo()
+
+    def OdomCallback(self, msg):
+        position = msg.pose.pose.position
+        orientation = msg.pose.pose.orientation
+
+        # base_link to world using ground truth odometry
+        t = TransformStamped()
+
+        t.header.stamp = self.get_clock().now().to_msg()
+        t.header.frame_id = 'world'
+        t.child_frame_id = 'base_link'
+
+        t.transform.translation.x = position.x
+        t.transform.translation.y = position.y
+        t.transform.translation.z = position.z
+
+        t.transform.rotation.x = orientation.x
+        t.transform.rotation.y = orientation.y
+        t.transform.rotation.z = orientation.z
+        t.transform.rotation.w = orientation.w
+
+        # Send the transformation
+        self.br.sendTransform(t)
 
 
 

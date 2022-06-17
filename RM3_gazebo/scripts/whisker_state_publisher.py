@@ -12,10 +12,7 @@ import rclpy
 from rclpy.node import Node
 from robominer_msgs.msg import WhiskerArray, Whisker
 from sensor_msgs.msg import JointState
-from geometry_msgs.msg import Point32, TransformStamped
-from nav_msgs.msg import Odometry
 
-from tf2_ros import TransformBroadcaster
 
 
 import numpy as np
@@ -61,10 +58,9 @@ class WhiskerPublisher(Node):
 
         self.whisker_length = 0.15
 
-        self.br = TransformBroadcaster(self)
+
         self.gotOdom = False
 
-        self.create_subscription(Odometry, '/odom/unfiltered', self.OdomCallback, 10)
         self.create_subscription(JointState, '/joint_states', self.JointStateCallback, 10)
 
 
@@ -112,28 +108,7 @@ class WhiskerPublisher(Node):
 
             self.whisker_pub.publish(all_whisker_msg)
 
-    def OdomCallback(self, msg):
-        position = msg.pose.pose.position
-        orientation = msg.pose.pose.orientation
 
-        # base_link to world using ground truth odometry
-        t = TransformStamped()
-
-        t.header.stamp = self.get_clock().now().to_msg()
-        t.header.frame_id = 'world'
-        t.child_frame_id = 'base_link'
-
-        t.transform.translation.x = position.x
-        t.transform.translation.y = position.y
-        t.transform.translation.z = position.z
-
-        t.transform.rotation.x = orientation.x
-        t.transform.rotation.y = orientation.y
-        t.transform.rotation.z = orientation.z
-        t.transform.rotation.w = orientation.w
-
-        # Send the transformation
-        self.br.sendTransform(t)
 
 
 def main(args=None):

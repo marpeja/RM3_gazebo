@@ -86,13 +86,18 @@ There are currently 4 world models:
   * terrain_world: World with an uneven terrain.
   * cave_world: World containing a mesh of the Belgium Cave in Han-sur-Lesse.
 
-To select a world, you need to edit the "_world_path_" variable in file "_/launch/spawn_RM3.launch.py_". colcon build the package for changes to take effect.
+To select a world, you need to edit the "_world_" variable in file "_/config/simulation_parameters.yaml_".
 
-## Enabling / Disabling Whiskers on the robot:
-To enable or disable the simulation of the whiskers on the robot, simply edit the file "_/urdf/RM3_robot.xacro.urdf_", and set the xacro:property "_enableWhiskers_" to either "_enable_" or "_disable_". colcon build the package for changes to take effect.
+## Setting simulation parameters:
+We now use a YAML file to set the simulation parameters. We use the PyYAML library to read the file content on Python. To install PyYAML:
+```
+sudo pip install pyyaml
+```
 
-## Enabling / Disabling RGB-D camera on the robot:
-if you want to use the camera make sure to enable it on the file "_/urdf/RM3_robot.xacro.urdf_", and set the xacro:property "_enableCamera_" to "_enable_". colcon build the package for changes to take effect.
+### Enabling / Disabling Whiskers on the robot:
+To enable or disable the simulation of the whiskers on the robot, simply edit the file "_/config/simulation_parameters.yaml_", and set the parameters "_enableWhiskers_" to either "_enable_" or "_disable_".
+### Enabling / Disabling RGB-D camera on the robot:
+To enable or disable the simulation of the RGBD camera on the robot, simply edit the file "_/config/simulation_parameters.yaml_", and set the parameters "_enableCamera_" to either "_enable_" or "_disable_".
 
 ## RTABMAP for SLAM mapping using an rgb-d camera
 We currently use RTABMAP for SLAM using the on-board camera (Realsense D455). To use it on the simulator also, you need to get the RTABMAP package for ROS2.
