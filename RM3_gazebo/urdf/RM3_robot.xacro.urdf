@@ -84,7 +84,7 @@
   </gazebo>
 
   <!-- Real-sense-camera mesh -->
-  <xacro:if value="${props['sensors']['camera']['enableCamera'] == 'enable'}">
+  <xacro:if value="${props['sensors']['camera']['enable_camera'] == 'enable'}">
 
       <link name="camera_frame"/>
 
@@ -149,7 +149,7 @@
   </xacro:screw>
 
   <!-- Whisker arrays -->
-<xacro:if value="${props['sensors']['whiskers']['enableWhiskers'] == 'enable'}">
+<xacro:if value="${props['sensors']['whiskers']['enable_whiskers'] == 'enable'}">
     <!-- <xacro:whisker_array name="7_front" whisker_length="${side_whisker_length}">
       <origin xyz="${whisker_array_x} 0 ${whisker_array_z}"
               rpy="${whisker_array_angle} 0 ${pi/2}" />
@@ -229,6 +229,6 @@
 </gazebo>
 
 <!-- Add sensors blocs -->
-<xacro:robot_sensors parent="base_link" enableCamera = "${props['sensors']['camera']['enableCamera']}"/>
+<xacro:robot_sensors parent="base_link" enableCamera = "${props['sensors']['camera']['enable_camera']}"/>
 
 </robot>

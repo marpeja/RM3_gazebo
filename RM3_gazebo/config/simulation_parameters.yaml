@@ -2,10 +2,10 @@ world: "cave_world" # select either "empty_world", "boxes_world", "terrain_world
 
 sensors:
   whiskers:
-    enableWhiskers: 'enable'  # 'enable' or 'disable'
+    enable_whiskers: 'enable'  # 'enable' or 'disable'
     bottom_whisker_length: 0.15
     side_whisker_length: 0.15
     map_type: "OnlyWhenDeflected" # "Always" or "OnlyWhenDeflected"
   camera:
-    enableCamera: 'enable' # 'enable' or 'disable'
+    enable_camera: 'enable' # 'enable' or 'disable'
     camera_angle: 0.0

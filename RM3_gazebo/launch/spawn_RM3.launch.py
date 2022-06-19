@@ -95,7 +95,7 @@ def generate_launch_description():
     )
 
     enableWhiskers = LaunchConfiguration('enableWhiskers')
-    if sim_params['sensors']['whiskers']['enableWhiskers'] == "enable":
+    if sim_params['sensors']['whiskers']['enable_whiskers'] == "enable":
         enableWhiskersValue = 'True'
     else:
         enableWhiskersValue = 'False'
