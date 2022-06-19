@@ -16,6 +16,10 @@ from sensor_msgs.msg import PointCloud
 from geometry_msgs.msg import Point32
 from nav_msgs.msg import Odometry
 
+import os
+from ament_index_python.packages import get_package_share_directory
+import yaml
+
 import numpy as np
 
 ######### Order of whisker rows and columns #########
@@ -48,14 +52,23 @@ class WhiskerVisualizer(Node):
     def __init__(self):
         super().__init__('whisker_state_visualizer')
 
+        simulation_parameters_yaml = os.path.join(
+                get_package_share_directory('rm3_gazebo'),
+                'config',
+                'simulation_parameters.yaml'
+                )
+
+        with open(simulation_parameters_yaml, 'r') as file:
+            # The FullLoader parameter handles the conversion from YAML
+            # scalar values to Python the dictionary format
+            sim_params = yaml.load(file, Loader=yaml.FullLoader)
+
+        self.mapping_type = sim_params['sensors']['whiskers']['map_type']
 
         self.whisker_pc_pub = self.create_publisher(PointCloud, '/WhikserPointCloud', 10)
 
         self.pose = None
         self.gotOdom = False
-
-        # Select either to create the pointcloud always, or only when whiskers are deflected
-        self.mapAll = True
 
         ## Whikser parameters
         # -------------------------------------------------------------------
@@ -99,7 +112,7 @@ class WhiskerVisualizer(Node):
         self.pointCloud_timer = self.create_timer(self.whiskers_viz_timer_period, self.processWhiskerData)
         self.whiskerData = []
         self.gotWhiskers = False
-        
+
     def OdomCallback(self, msg):
         if not self.gotOdom:
             self.gotOdom = True
@@ -120,8 +133,9 @@ class WhiskerVisualizer(Node):
 
                 whisker = msg.whiskers[i]
 
-                condition = (self.mapAll or (whisker.x**2 + whisker.y**2) > 0.02)
-                if condition:
+                condition1 = self.mapping_type == "Always"
+                condition2 = whisker.x**2 + whisker.y**2 > 0.02
+                if condition1 or condition2:
                     # This applies for bottom whiskers
                     if whisker.pos.row_num < 4:
                         whisker_pos = np.array([self.whisker_x + (whisker.pos.col_num-3)*self.whisker_x_bias,

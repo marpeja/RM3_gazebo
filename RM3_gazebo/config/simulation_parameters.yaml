@@ -4,7 +4,8 @@ sensors:
   whiskers:
     enableWhiskers: 'enable'  # 'enable' or 'disable'
     bottom_whisker_length: 0.15
-    side_whisker_length: 0.2
+    side_whisker_length: 0.15
+    map_type: "OnlyWhenDeflected" # "Always" or "OnlyWhenDeflected"
   camera:
-    enableCamera: 'no' # 'enable' or 'disable'
+    enableCamera: 'enable' # 'enable' or 'disable'
     camera_angle: 0.0
