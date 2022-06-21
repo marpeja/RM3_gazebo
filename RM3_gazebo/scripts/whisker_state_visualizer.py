@@ -165,9 +165,9 @@ class WhiskerVisualizer(Node):
 
                         whisker_pos += np.array(self.array_location[whisker.pos.row_num])
 
-                        tip_position = [self.side_whisker_length * np.sin(whisker.x),
-                                        self.side_whisker_length * np.sin(whisker.y)*np.cos(whisker.x),
-                                        -self.side_whisker_length * np.cos(whisker.x)*np.cos(whisker.y)]
+                        tip_position = [self.side_whisker_length * np.sin(whisker.x)*np.cos(whisker.y),
+                                        -self.side_whisker_length * np.sin(whisker.y),
+                                        -self.side_whisker_length * np.cos(whisker.y)*np.cos(whisker.x)]
 
                         whisker_tip_hom = np.array([tip_position[0], tip_position[1], tip_position[2], 1.0])
 
