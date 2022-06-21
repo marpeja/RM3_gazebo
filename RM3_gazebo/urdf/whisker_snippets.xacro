@@ -6,9 +6,9 @@
 
 
   <xacro:property name="whisker_mesh_file" value="file://$(find rm3_gazebo)/urdf/meshes/whisker.dae"/>
-  <xacro:property name="whisker_array_mesh_file" value="file://$(find rm3_gazebo)/urdf/meshes/whisker_array.dae"/>
+  <xacro:property name="whisker_array_mesh_file" value="file://$(find rm3_gazebo)/urdf/meshes/whisker_array_thin.dae"/>
 
-  
+
   <xacro:property name="whisker_radius" value="0.002"/>
   <xacro:property name="whisker_array_mass" value="2.75"/>
 
@@ -172,6 +172,7 @@
             izz="${(1/12)*whisker_array_mass*(whisker_collision_box_x**2 + whisker_collision_box_y**2)}"/>
         </inertial>
           <visual>
+              <origin xyz="0.0 0.0 0.0" rpy="-1.57 0.0 0"/>
               <geometry>
                 <mesh filename="${whisker_array_mesh_file}" scale="1 1 1"/>
               </geometry>

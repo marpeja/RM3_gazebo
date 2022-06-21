@@ -104,9 +104,10 @@ We currently use RTABMAP for SLAM using the on-board camera (Realsense D455). To
 
 ```
 cd ~/dev_ws/src
-git clone –branch foxy-devel https://github.com/introlab/rtabmap.git
+git clone --branch foxy-devel https://github.com/introlab/rtabmap.git
 git clone --branch foxy-devel https://github.com/introlab/rtabmap_ros.git
 export MAKEFLAGS="-j2" # Can be ignored if you have a lot of RAM (>16GB)
+cd ~/dev_ws
 colcon build --symlink-install
 ```
 To launch the SLAM nodes, run:

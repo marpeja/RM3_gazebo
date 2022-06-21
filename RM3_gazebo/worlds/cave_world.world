@@ -23,5 +23,17 @@
       </include>
     </model>
 
+    <!-- <gui fullscreen='0'>
+     <camera name="user_camera">
+        <track_visual>
+          <name>RM3</name>
+          <static>true</static>
+          <use_model_frame>true</use_model_frame>
+          <xyz>-2 0 0.5</xyz>
+          <inherit_yaw>true</inherit_yaw>
+        </track_visual>
+    </camera>
+    </gui> -->
+
     </world>
   </sdf>

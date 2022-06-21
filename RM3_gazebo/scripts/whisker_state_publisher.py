@@ -12,8 +12,9 @@ import rclpy
 from rclpy.node import Node
 from robominer_msgs.msg import WhiskerArray, Whisker
 from sensor_msgs.msg import JointState
-
-
+import os
+from ament_index_python.packages import get_package_share_directory
+import yaml
 
 import numpy as np
 
@@ -47,20 +48,24 @@ class WhiskerPublisher(Node):
     def __init__(self):
         super().__init__('whisker_state_publisher')
 
-        self.whisker_pub = self.create_publisher(WhiskerArray, '/WhiskerStates', 10)
-        self.declare_parameter('which_representation')
-        self.which_representation = self.get_parameter('which_representation').value
+        # Load simulation parameters
+        # --------------------------------------------
+        simulation_parameters_yaml = os.path.join(
+                get_package_share_directory('rm3_gazebo'),
+                'config',
+                'simulation_parameters.yaml'
+                )
+        with open(simulation_parameters_yaml, 'r') as file:
+            sim_params = yaml.load(file, Loader=yaml.FullLoader)
+        # --------------------------------------------
 
-        self.declare_parameter('number_of_arrays')
-        number_of_arrays = self.get_parameter('number_of_arrays').value
-
-        self.whisker_total = 8 * number_of_arrays
+        self.which_representation = sim_params['sensors']['whiskers']['representation']
+        self.whisker_total = sim_params['sensors']['whiskers']['whiskers_num']
 
         self.whisker_length = 0.15
-
-
         self.gotOdom = False
 
+        self.whisker_pub = self.create_publisher(WhiskerArray, '/WhiskerStates', 10)
         self.create_subscription(JointState, '/joint_states', self.JointStateCallback, 10)
 
 
