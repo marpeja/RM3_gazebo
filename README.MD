@@ -161,7 +161,8 @@ colcon build --symlink-install
 
 Launching navigation2:
 
+```
 ros2 launch rm3_nav navigation2.launch.py
-
+```
 
 
