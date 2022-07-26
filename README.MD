@@ -129,7 +129,7 @@ To launch RTABMAP in localization node:
 ros2 launch rm3_gazebo RM3_RTABMAP.launch.py localization:=true
 ```
 
-RTABMAP will create a folder (by default called .ros) where the info of the mapping session will be stored after rtabmap.db. This file is deleted every time the node is launched in Mapping mode, in order to store the new session. Several sessions have been already recorded to simplify the test of the package. You can simply copy the rtabmap.db you want to try from the ............ package and save it under the .ros folder mentioned. After that, launch the rtabmap node in localization node.
+RTABMAP will create a folder (by default called .ros) where the info of the mapping session will be stored after rtabmap.db. This file is deleted every time the node is launched in Mapping mode, in order to store the new session. Several sessions have been already recorded to simplify the test of the package. You can simply copy the rtabmap.db you want to try from the https://github.com/marpeja/RM3_maps.git package and save it under the .ros folder mentioned. After that, launch the rtabmap node in localization node.
 
 
 ## Known bugs:
