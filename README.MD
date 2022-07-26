@@ -151,7 +151,7 @@ echo "source /opt/ros/foxy/setup.bash" >> ~/.bashrc
 
 mkdir -p dev_ws/src
 cd dev_ws/src
-git clone git@github.com:marpeja/RM3_nav.git
+git clone https://github.com/marpeja/RM3_nav.git
 cd ..
 rosdep update
 rosdep install -y -r -q --from-paths src --ignore-src --rosdistro foxy 
@@ -162,7 +162,7 @@ colcon build --symlink-install
 Launching navigation2:
 
 ```
-ros2 launch rm3_nav navigation2.launch.py
+ros2 launch nav_rm3 navigation2.launch.py
 ```
 
 
