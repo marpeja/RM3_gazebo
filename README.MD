@@ -9,6 +9,13 @@ This repo contains a Gazebo11 + ROS2 Foxy simulator for the Robominer lab protot
 Make sure to install the robominer package first:
 https://github.com/robominers-eu/TALTECH_RM3_ROS_PACKAGES
 
+You may have to add the installation prefix of robominer_msgs after colcon build robominer_msgs before the rest of the packages:
+
+```
+export CMAKE_PREFIX_PATH=...../dev_ws/install/robominer_msgs/share/robominer_msgs/cmake
+```
+
+
 # Install ros2_control dependencies from Foxy branch:
 
 ```
@@ -41,12 +48,12 @@ source install/setup.bash
 ## to clone via https:
 ```
 cd ~/dev_ws/src
-git clone https://github.com/robominers-eu/RM3_gazebo.git
+git clone https://github.com/marpeja/RM3_gazebo.git
 ```
 
 ## to clone via SSH:
 ```
-git clone git@github.com:robominers-eu/RM3_gazebo.git
+git clone git@github.com:marpeja/RM3_gazebo.git
 ```
 
 ## Compile:
@@ -110,12 +117,19 @@ export MAKEFLAGS="-j2" # Can be ignored if you have a lot of RAM (>16GB)
 cd ~/dev_ws
 colcon build --symlink-install
 ```
-To launch the SLAM nodes, run:
+To launch the SLAM nodes, run. This will launch RTABMAP in mapping mode:
 
 ```
 ros2 launch rm3_gazebo RM3_RTABMAP.launch.py
 ```
 To visualize the point cloud in Rviz2, you need to set the fixed frame to '_map_' instead of '_world_'
+
+To launch RTABMAP in localization node:
+```
+ros2 launch rm3_gazebo RM3_RTABMAP.launch.py localization:=true
+```
+
+RTABMAP will create a folder (by default called .ros) where the info of the mapping session will be stored after rtabmap.db. This file is deleted every time the node is launched in Mapping mode, in order to store the new session. Several sessions have been already recorded to simplify the test of the package. You can simply copy the rtabmap.db you want to try from the ............ package and save it under the .ros folder mentioned. After that, launch the rtabmap node in localization node.
 
 
 ## Known bugs:
@@ -123,3 +137,31 @@ When running '_ros2 launch rm3_gazebo spawn_RM3.launch.py_', if you get an error
 ```
 sudo chmod +x ~/dev_ws/src/robominer_taltech/RM3_gazebo/scripts/*.py
 ```
+
+## Nav2
+
+### Install
+```
+pip install xacro
+sudo apt install ros-foxy-slam-toolbox
+sudo apt install ros-foxy-navigation2 ros-foxy-nav2-bringup ros-foxy-turtlebot3*
+```
+```
+echo "source /opt/ros/foxy/setup.bash" >> ~/.bashrc
+
+mkdir -p dev_ws/src
+cd dev_ws/src
+git clone git@github.com:marpeja/RM3_nav.git
+cd ..
+rosdep update
+rosdep install -y -r -q --from-paths src --ignore-src --rosdistro foxy 
+colcon build --symlink-install
+```
+### Navigate
+
+Launching navigation2:
+
+ros2 launch rm3_nav navigation2.launch.py
+
+
+
