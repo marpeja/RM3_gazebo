@@ -19,7 +19,7 @@
     <model name="Cave_model">
       <include>
         <uri>model://cave</uri>
-        <pose> 33.0 0 -0.5 0 0 -1.4</pose>
+        <pose> 33 0 -0.5 0 0 -1.4</pose>
       </include>
     </model>
 

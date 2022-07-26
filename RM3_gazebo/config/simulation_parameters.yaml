@@ -13,5 +13,5 @@ sensors:
     map_type: "Always" # "Always" or "OnlyWhenDeflected"
     representation: "Spherical" # Spherical
   camera:
-    enable_camera: 'disable' # 'enable' or 'disable'
+    enable_camera: 'enable' # 'enable' or 'disable'
     camera_angle: 0.0

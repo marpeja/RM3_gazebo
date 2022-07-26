@@ -26,8 +26,7 @@
         </material>
       </visual>
     </link>
-
-    <link name="rock1">
+    <!--<link name="rock1">
       <pose> -5.5 -32 0.2 0 0 0</pose>
       <collision name="collision">
         <geometry>
@@ -103,7 +102,7 @@
           <emissive>0 0 0 1</emissive>
         </material>
       </visual>
-    </link>
+    </link>-->
 
   </model>
 </sdf>

@@ -64,7 +64,7 @@ class WhiskerVisualizer(Node):
 
         self.mapping_type = sim_params['sensors']['whiskers']['map_type']
         self.whiskers_num = sim_params['sensors']['whiskers']['whiskers_num']
-        self.whisker_pc_pub = self.create_publisher(PointCloud, '/WhikserPointCloud', 10)
+        self.whisker_pc_pub = self.create_publisher(PointCloud, '/WhiskerPointCloud', 10)
 
         self.pose = None
         self.gotOdom = False
