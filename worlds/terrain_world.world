@@ -1,0 +1,27 @@
+<sdf version="1.4">
+    <world name="default">
+      <include>
+        <uri>model://sun</uri>
+      </include>
+
+      <!-- Faster physics solver to run the simulation on limited hardware -->
+      <physics default="1" name="ODE_SOLVER" type="ode">
+       <real_time_update_rate>100.0</real_time_update_rate>
+       <max_step_size>0.01</max_step_size>
+       <real_time_factor>1.0</real_time_factor>
+      </physics>
+
+      <include>
+       <uri>model://ground_plane</uri>
+     </include>
+
+     <!-- Terrain model -->
+    <model name="terrain">
+      <include>
+        <uri>model://terrain</uri>
+        <pose> 0.0 0 -0.2 0 0 0</pose>
+      </include>
+    </model>
+
+    </world>
+  </sdf>

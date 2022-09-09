@@ -1,0 +1,17 @@
+world: "cave_world" # select either "empty_world", "boxes_world", "terrain_world" or "cave_world"
+
+sensors:
+  whiskers:
+    enable_whiskers: 'enable'  # 'enable' or 'disable'
+    enable_side_whiskers: 'enable'  # 'enable' or 'disable'
+
+    bottom_whisker_length: 0.15 # length in meters
+    side_whisker_length: 0.15 # length in meters
+    side_array_angle: 2.15 # angle in rads
+    whiskers_num: 64
+
+    map_type: "Always" # "Always" or "OnlyWhenDeflected"
+    representation: "Spherical" # Spherical
+  camera:
+    enable_camera: 'enable' # 'enable' or 'disable'
+    camera_angle: 0.0

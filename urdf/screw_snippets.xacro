@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<!-- June 2022 -->
+<!-- Author: Walid Remmas -->
+<!-- Contact: walid.remmas@ŧaltech.ee -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Mesh files -->
+  <xacro:property name="ccw_mesh_file" value="file://$(find rm3_gazebo)/urdf/meshes/screw_ccw.dae"/>
+  <xacro:property name="cw_mesh_file" value="file://$(find rm3_gazebo)/urdf/meshes/screw_cw.dae"/>
+
+  <!-- Collisions and inertial parameters -->
+  <xacro:property name="screw_collision_radius" value="0.055"/>
+  <xacro:property name="screw_collision_height" value="0.48"/>
+  <xacro:property name="screw_mass" value="3.0"/>
+
+  <!-- Screw velocity limits  -->
+  <xacro:property name="screw_min_velocity" value="-50"/>
+  <xacro:property name="screw_max_velocity" value="50"/>
+
+<!-- Macro for screw defintion -->
+  <xacro:macro name="screw" params="name *origin">
+      <!--  THIS LINK IS USED TO VISUALIZE SCREW ROTATIONS -->
+      <!-- *********************************************** -->
+      <joint name="${name}_screw" type="continuous">
+          <xacro:insert_block name="origin"/>
+          <parent link="chassis"/>
+          <child link="${name}_screw_link"/>
+          <axis xyz="1 0 0"/>
+          <dynamics damping="0.1"/>
+          <limit
+          effort="500"
+          velocity="${pi}" />
+      </joint>
+
+      <link name="${name}_screw_link">
+        <inertial>
+            <xacro:if value="${name == 'BR' or name == 'FL'}">
+                 <origin xyz="-0.05 0.0 0.0" rpy="0 1.57 0"/>
+            </xacro:if>
+            <xacro:if value="${name == 'FR' or name == 'BL'}">
+                 <origin xyz="0.05 0.0 0.0" rpy="0 1.57 0"/>
+            </xacro:if>
+          <mass value="${screw_mass / 100}" />
+          <inertia ixx="${(1.0 / 12.0) * screw_mass / 100 * (3 * 0.01 ** 2 + 0.25 **2)}"
+                   iyy="${(1.0 / 12.0) * screw_mass / 100 * (3 * 0.01 ** 2 + 0.25 **2)}"
+                   izz="${(1.0 / 12.0) * screw_mass / 100 * 0.01 ** 2}"
+                   iyz="0.0" ixy="0.0" ixz="0.0"
+                    />
+       </inertial>
+        <visual>
+          <xacro:if value="${name == 'FR' or name == 'BL'}">
+              <origin xyz="0 0 0" rpy="0 0 3.14" />
+              <geometry>
+                <mesh filename="${ccw_mesh_file}" scale="1 1 1"/>
+              </geometry>
+          </xacro:if>
+          <xacro:if value="${name == 'FL' or name == 'BR'}">
+              <origin xyz="0 0 0" rpy="0 0 3.14" />
+              <geometry>
+                <mesh filename="${cw_mesh_file}" scale="1 1 1"/>
+              </geometry>
+          </xacro:if>
+        </visual>
+
+        <collision>
+            <xacro:if value="${name == 'FR' or name == 'BL'}">
+                <origin xyz="0.0 0.0 0.0" rpy="0 1.57 0"/>
+            </xacro:if>
+            <xacro:if value="${name == 'FL' or name == 'BR'}">
+                <origin xyz="-0.0 0.0 0.0" rpy="0 1.57 0"/>
+            </xacro:if>
+           <geometry>
+             <cylinder radius="0.01" length="0.25"/>
+           </geometry>
+        </collision>
+
+      </link>
+      <!-- *********************************************** -->
+
+      <!--  THIS LINK IS USED TO ENSURE SIMPLER AND TUNABLE COLLISIONS WITH THE ENVIRONMENT -->
+      <!-- *********************************************** -->
+      <joint name="${name}_screw_collision" type="fixed">
+          <xacro:insert_block name="origin"/>
+          <parent link="chassis"/>
+          <child link="${name}_screw_collision_link"/>
+      </joint>
+
+      <link name="${name}_screw_collision_link">
+        <inertial>
+            <xacro:if value="${name == 'BR' or name == 'FL'}">
+                 <origin xyz="-0.17 0.0 0.0" rpy="0 0.0 0"/>
+            </xacro:if>
+            <xacro:if value="${name == 'FR' or name == 'BL'}">
+                 <origin xyz="0.17 0.0 0.0" rpy="0 0.0 0"/>
+            </xacro:if>
+            <mass value="${screw_mass}" />
+            <inertia ixx="${(1.0 / 12.0) * screw_mass * (3 * screw_collision_radius ** 2 + screw_collision_height **2)}"
+                     iyy="${(1.0 / 12.0) * screw_mass * (3 * screw_collision_radius ** 2 + screw_collision_height **2)}"
+                     izz="${(1.0 / 12.0) * screw_mass * screw_collision_radius ** 2}"
+                     iyz="0.0" ixy="0.0" ixz="0.0"
+                      />
+         </inertial>
+
+         <collision>
+             <xacro:if value="${name == 'FR' or name == 'BL'}">
+                 <origin xyz="0.0 0.0 0.0" rpy="0 1.57 0"/>
+             </xacro:if>
+             <xacro:if value="${name == 'FL' or name == 'BR'}">
+                 <origin xyz="-0.0 0.0 0.0" rpy="0 1.57 0"/>
+             </xacro:if>
+            <geometry>
+              <cylinder radius="${screw_collision_radius}" length="${screw_collision_height}"/>
+            </geometry>
+         </collision>
+
+         <collision>
+             <xacro:if value="${name == 'FR' or name == 'BL'}">
+                 <origin xyz="0.25 0.0 0.0" rpy="0 0 0"/>
+             </xacro:if>
+             <xacro:if value="${name == 'FL' or name == 'BR'}">
+                 <origin xyz="-0.25 0.0 0.0" rpy="0 0 0"/>
+             </xacro:if>
+            <geometry>
+              <sphere radius="${screw_collision_radius}"/>
+            </geometry>
+         </collision>
+      </link>
+
+      <gazebo reference="${name}_screw_collision_link">
+        <mu1 value="0.5"/>
+        <mu2 value="0.5"/>
+        <kp value="10000.0" />
+        <kd value="100000.0" />
+        <material>Gazebo/Grey</material>
+      </gazebo>
+  </xacro:macro>
+
+<!-- Screw velocity controller -->
+ <xacro:macro name="velocity_controller" params="joint_name">
+     <joint name="${joint_name}">
+       <command_interface name="velocity">
+         <param name="min">${screw_min_velocity}</param>
+         <param name="max">${screw_max_velocity}</param>
+       </command_interface>
+       <state_interface name="position"/>
+       <state_interface name="velocity"/>
+     </joint>
+ </xacro:macro>
+
+</robot>

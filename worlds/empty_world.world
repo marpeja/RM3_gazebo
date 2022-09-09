@@ -1,0 +1,24 @@
+<sdf version="1.4">
+
+     <gravity>0.0 0.0 -9.81</gravity>
+
+     <!-- Faster physics solver to run the simulation on limited hardware -->
+     <physics default="1" name="ODE_SOLVER" type="ode">
+      <real_time_update_rate>100.0</real_time_update_rate>
+      <max_step_size>0.01</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+     </physics>
+
+
+    <world name="default">
+      <include>
+        <uri>model://sun</uri>
+      </include>
+
+      <include>
+       <uri>model://ground_plane</uri>
+     </include>
+
+    </world>
+
+  </sdf>

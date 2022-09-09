@@ -1,0 +1,275 @@
+<?xml version="1.0"?>
+<!-- June 2022 -->
+<!-- Author: Walid Remmas -->
+<!-- Contact: walid.remmas@ŧaltech.ee -->
+<robot name="RM3_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- Base Link -->
+  <xacro:include filename="$(find rm3_gazebo)/urdf/screw_snippets.xacro"/>
+  <xacro:include filename="$(find rm3_gazebo)/urdf/whisker_snippets.xacro"/>
+  <xacro:include filename="$(find rm3_gazebo)/urdf/sensors.xacro"/>
+  <xacro:property name="whisker_array_angle" value="2.15"/>
+  <xacro:property name="whisker_array_x" value="0.39"/>
+  <xacro:property name="whisker_array_y" value="0.33"/>
+  <xacro:property name="whisker_array_z" value="0.32"/>
+  <xacro:property name="body_mass" value="25"/>
+  <xacro:property name="body_collision_box_x" value="0.8"/>
+  <xacro:property name="body_collision_box_y" value="0.75"/>
+  <xacro:property name="body_collision_box_z" value="0.05"/>
+
+  <!-- Add whiskers on the robot --> <!-- "enable" or "disable" -->
+  <xacro:property name="yaml_file" value="$(find rm3_gazebo)/config/simulation_parameters.yaml" />
+  <xacro:property name="props" value="${load_yaml(yaml_file)}"/>
+
+  <xacro:property name="bottom_whisker_length" value="${props['sensors']['whiskers']['bottom_whisker_length']}"/>
+  <xacro:property name="side_whisker_length" value="${props['sensors']['whiskers']['side_whisker_length']}"/>
+
+  <!--Camera mass and dimension properties -->
+  <xacro:property name="camera_mass" value="0.564"/>
+  <xacro:property name="camera_collision_box_x" value="0.125"/>
+  <xacro:property name="camera_collision_box_y" value="0.025"/>
+  <xacro:property name="camera_collision_box_z" value="0.03"/>
+  <xacro:property name="camera_angle" value="${props['sensors']['camera']['camera_angle']}"/>
+
+
+
+   <link name="base_link">
+   </link>
+
+   <joint name="dummy_joint" type="fixed">
+     <origin xyz="0.0 0.0 -0.32" rpy="0.0 0.0 0.0"/>
+     <parent link="base_link"/>
+     <child link="chassis"/>
+   </joint>
+
+  <link name="chassis">
+      <inertial>
+        <origin xyz="0.0 0.0 0.3" rpy="0.0 0.0 0.0"/>
+        <mass value="${body_mass}"/>
+        <inertia
+          ixx="${(1.0/12.0) * body_mass * (body_collision_box_y ** 2 + body_collision_box_z ** 2)}"
+          ixy="0.0"
+          ixz="0.0"
+          iyy="${(1.0/12.0) * body_mass * (body_collision_box_x ** 2 + body_collision_box_z ** 2)}"
+          iyz="0.0"
+          izz="${(1.0/12.0) * body_mass * (body_collision_box_y ** 2 + body_collision_box_x ** 2)}"/>
+      </inertial>
+
+    <collision>
+      <origin xyz="0.0 0.0 0.3" rpy="0.0 0.0 0.0"/>
+      <geometry>
+        <box size="${body_collision_box_x} ${body_collision_box_y} ${body_collision_box_z}" />
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0.0 0.0 0.3" rpy="1.57 0.0 0"/>
+      <geometry>
+        <mesh filename="file://$(find rm3_gazebo)/urdf/meshes/body_platform.dae"/>
+      </geometry>
+    </visual>
+    <visual>
+      <origin xyz="0.0 0.0 0.34" rpy="0.0 0.0 0"/>
+      <geometry>
+        <mesh filename="file://$(find rm3_gazebo)/urdf/meshes/electronics_box.dae"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <gazebo reference="chassis">
+    <mu1 value="50.0"/>
+    <mu2 value="50.0"/>
+    <kp value="1000.0" />
+    <kd value="1.0" />
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
+  <!-- Real-sense-camera mesh -->
+  <xacro:if value="${props['sensors']['camera']['enable_camera'] == 'enable'}">
+
+      <link name="camera_frame"/>
+
+      <joint name="camera_fixed_joint" type="fixed">
+        <origin xyz="0.38 0.0 0.32" rpy="0 ${camera_angle} 0.0" />
+        <parent link="chassis"/>
+        <child link="realsense_camera"/>
+      </joint>
+
+      <link name="realsense_camera">
+          <inertial>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <mass value="${camera_mass}"/>
+            <inertia
+              ixx="${(1.0/12.0) * camera_mass * (camera_collision_box_y ** 2 + camera_collision_box_z ** 2)}"
+              ixy="0.0"
+              ixz="0.0"
+              iyy="${(1.0/12.0) * camera_mass * (camera_collision_box_x ** 2 + camera_collision_box_z ** 2)}"
+              iyz="0.0"
+              izz="${(1.0/12.0) * camera_mass * (camera_collision_box_y ** 2 + camera_collision_box_x ** 2)}"/>
+          </inertial>
+
+        <collision>
+          <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 1.57"/>
+          <geometry>
+            <box size="${camera_collision_box_x} ${camera_collision_box_y} ${camera_collision_box_z}" />
+          </geometry>
+        </collision>
+
+        <visual>
+          <origin xyz="-0.02 0.0 0.0" rpy="0.0 0.0 1.57"/>
+          <geometry>
+            <mesh filename="file://$(find rm3_gazebo)/urdf/meshes/realsense.dae"/>
+          </geometry>
+        </visual>
+      </link>
+
+    <joint name="camera_transform_joint" type="fixed">
+        <origin xyz="0.0 0.0 0.0" rpy="-1.57079632679 0.0 -1.57079632679" />
+        <parent link="realsense_camera"/>
+        <child link="camera_frame"/>
+    </joint>
+    <!--
+    <link name="lidar_link">
+        <inertial>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <mass value="0.125"/>
+          <inertia ixx="0.001"  ixy="0"  ixz="0" iyy="0.001" iyz="0" izz="0.001" />
+        </inertial>
+
+        <collision>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+             <cylinder radius="0.0508" length="0.055"/>
+          </geometry>
+        </collision>
+
+        <visual>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+             <cylinder radius="0.0508" length="0.055"/>
+          </geometry>
+        </visual>
+    </link>
+
+    <joint name="lidar_joint" type="fixed">
+        <parent link="chassis"/>
+        <child link="lidar_link"/>
+        <origin xyz="0.36 0 0.3625" rpy="0 0 0"/>
+    </joint> -->
+
+  </xacro:if>
+
+  <!-- FR screw -->
+  <xacro:screw name="FR">
+    <origin xyz="0.01 -0.305 0.148" rpy="0 0 0" />
+  </xacro:screw>
+  <!-- BR screw -->
+  <xacro:screw name="BR">
+    <origin xyz="-0.01 -0.305 0.148" rpy="0 0 0" />
+  </xacro:screw>
+
+  <!-- BL screw -->
+  <xacro:screw name="BL">
+    <origin xyz="-0.01 0.305 0.148" rpy="0 0 3.14" />
+  </xacro:screw>
+
+  <xacro:screw name="FL">
+    <origin xyz="0.01 0.305 0.148" rpy="0 0 3.14" />
+  </xacro:screw>
+
+  <!-- Whisker arrays -->
+<xacro:if value="${props['sensors']['whiskers']['enable_whiskers'] == 'enable'}">
+    <xacro:if value="${props['sensors']['whiskers']['enable_side_whiskers'] == 'enable'}">
+        <!-- <xacro:whisker_array name="8_front" whisker_length="${side_whisker_length}">
+          <origin xyz="${whisker_array_x} 0 ${whisker_array_z}"
+                  rpy="${whisker_array_angle} 0 ${pi/2}" />
+        </xacro:whisker_array>
+
+        <xacro:whisker_array name="9_rear" whisker_length="${side_whisker_length}">
+          <origin xyz="${-whisker_array_x} 0 ${whisker_array_z}"
+                  rpy="${-whisker_array_angle} 0 ${pi/2}" />
+        </xacro:whisker_array> -->
+
+        <xacro:whisker_array name="6_left" whisker_length="${side_whisker_length}">
+          <origin xyz="0 ${whisker_array_y} ${whisker_array_z}"
+                  rpy="${-whisker_array_angle} 0 0" />
+        </xacro:whisker_array>
+
+        <xacro:whisker_array name="7_right" whisker_length="${side_whisker_length}">
+          <origin xyz="0 ${-whisker_array_y} ${whisker_array_z}"
+                  rpy="${whisker_array_angle} 0 0" />
+        </xacro:whisker_array>
+    </xacro:if>
+
+    <!-- 6 Whisker arrays in the bottom-->
+    <xacro:whisker_array name="0_bottom_right_0" whisker_length="${bottom_whisker_length}">
+      <origin xyz="0 ${-0.20} 0.285"
+              rpy="${pi} 0 0" />
+    </xacro:whisker_array>
+
+    <xacro:whisker_array name="1_bottom_right_1" whisker_length="${bottom_whisker_length}">
+      <origin xyz="0 ${-0.12} 0.285"
+              rpy="${pi} 0 0" />
+    </xacro:whisker_array>
+
+    <xacro:whisker_array name="2_bottom_right_middle" whisker_length="${bottom_whisker_length}">
+      <origin xyz="0 ${-0.04} 0.285"
+              rpy="${pi} 0 0" />
+    </xacro:whisker_array>
+
+
+    <xacro:whisker_array name="3_bottom_left_middle" whisker_length="${bottom_whisker_length}">
+      <origin xyz="0 ${0.04} 0.285"
+              rpy="${pi} 0 0" />
+    </xacro:whisker_array>
+
+    <xacro:whisker_array name="4_bottom_left_1" whisker_length="${bottom_whisker_length}">
+      <origin xyz="0 ${0.12} 0.285"
+              rpy="${pi} 0 0" />
+    </xacro:whisker_array>
+
+    <xacro:whisker_array name="5_bottom_left_0" whisker_length="${bottom_whisker_length}">
+      <origin xyz="0 ${0.20} 0.285"
+              rpy="${pi} 0 0" />
+    </xacro:whisker_array>
+
+</xacro:if>
+
+
+  <!-- Screws velocity controllers  -->
+  <ros2_control name="GazeboSystem" type="system">
+    <hardware>
+      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+    </hardware>
+    <!-- Screws velocity controllers  -->
+    <xacro:velocity_controller joint_name="FR_screw"/>
+    <xacro:velocity_controller joint_name="BR_screw"/>
+    <xacro:velocity_controller joint_name="BL_screw"/>
+    <xacro:velocity_controller joint_name="FL_screw"/>
+  </ros2_control>
+
+  <gazebo>
+    <!-- Joint state publisher -->
+    <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+      <parameters>$(find rm3_gazebo)/config/screw_controller.yaml</parameters>
+    </plugin>
+  </gazebo>
+
+  <gazebo>
+  <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
+    <ros>
+      <argument>odom:=odom/unfiltered</argument>
+    </ros>
+    <command_topic>cmd_vel</command_topic>
+    <odometry_topic>odom/unfiltered</odometry_topic>
+    <odometry_frame>world</odometry_frame>
+    <odometry_rate>20.0</odometry_rate>
+    <robot_base_frame>base_link</robot_base_frame>
+    <publish_odom>true</publish_odom>
+    <publish_odom_tf>true</publish_odom_tf>
+  </plugin>
+</gazebo>
+
+<!-- Add sensors blocs -->
+<xacro:robot_sensors parent="base_link" enableCamera = "${props['sensors']['camera']['enable_camera']}"/>
+
+</robot>

@@ -1,0 +1,39 @@
+<sdf version="1.4">
+    <world name="default">
+      <include>
+        <uri>model://sun</uri>
+      </include>
+
+      <!-- Faster physics solver to run the simulation on limited hardware -->
+      <physics default="1" name="ODE_SOLVER" type="ode">
+       <real_time_update_rate>100.0</real_time_update_rate>
+       <max_step_size>0.01</max_step_size>
+       <real_time_factor>1.0</real_time_factor>
+      </physics>
+
+      <!-- <include>
+       <uri>model://ground_plane</uri>
+     </include> -->
+
+     <!-- Terrain model -->
+    <model name="Cave_model">
+      <include>
+        <uri>model://cave</uri>
+        <pose> 66 0 -1.5 0 0 -1.4</pose>
+      </include>
+    </model>
+
+    <!-- <gui fullscreen='0'>
+     <camera name="user_camera">
+        <track_visual>
+          <name>RM3</name>
+          <static>true</static>
+          <use_model_frame>true</use_model_frame>
+          <xyz>-2 0 0.5</xyz>
+          <inherit_yaw>true</inherit_yaw>
+        </track_visual>
+    </camera>
+    </gui> -->
+
+    </world>
+  </sdf>
